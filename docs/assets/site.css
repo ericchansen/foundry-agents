@@ -1,0 +1,105 @@
+:root {
+  color-scheme: light dark;
+  --accent: #0078d4;
+  --border: #d0d7de;
+  --surface: #f6f8fa;
+  --text: #1f2328;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  margin: 0;
+}
+
+.shell {
+  margin: 0 auto;
+  max-width: 72rem;
+  padding: 0 1.5rem;
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 0;
+}
+
+.brand {
+  color: inherit;
+  display: inline-block;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: .6rem;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem 1.1rem;
+}
+
+a {
+  color: var(--accent);
+}
+
+.content {
+  min-height: calc(100vh - 10rem);
+  padding-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+h1, h2, h3 {
+  line-height: 1.25;
+  margin-top: 2rem;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-top: 0;
+}
+
+table {
+  border-collapse: collapse;
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+td, th {
+  border: 1px solid var(--border);
+  padding: .55rem .7rem;
+  text-align: left;
+}
+
+th {
+  background: var(--surface);
+}
+
+code {
+  font-size: .9em;
+}
+
+pre {
+  background: var(--surface);
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  font-size: .9rem;
+  padding-bottom: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border: #30363d;
+    --surface: #161b22;
+    --text: #f0f6fc;
+  }
+}

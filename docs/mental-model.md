@@ -1,3 +1,8 @@
+---
+title: Mental model
+description: Understand the platform, image, protocol, and identity boundaries of a Foundry hosted agent.
+---
+
 # Hosted-agent mental model
 
 ## The shortest useful definition

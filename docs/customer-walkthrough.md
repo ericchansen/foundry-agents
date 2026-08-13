@@ -1,3 +1,8 @@
+---
+title: Customer walkthrough
+description: Run hosted-agent discovery and demonstration conversations with customers.
+---
+
 # Customer walkthrough guide
 
 Use this guide to turn a vague "deploy our custom image as an agent" request

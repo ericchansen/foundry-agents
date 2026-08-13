@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ page.description | default: site.description }}">
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell">
+        <a class="brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+        <nav aria-label="Primary navigation">
+          <a href="{{ '/' | relative_url }}">Overview</a>
+          <a href="{{ '/hosted-agents/' | relative_url }}">Hosted agents</a>
+          <a href="{{ '/mental-model/' | relative_url }}">Mental model</a>
+          <a href="{{ '/cheat-sheet/' | relative_url }}">Commands</a>
+          <a href="{{ '/troubleshooting-playbook/' | relative_url }}">Troubleshooting</a>
+          <a href="{{ '/customer-walkthrough/' | relative_url }}">Customer walkthrough</a>
+        </nav>
+      </div>
+    </header>
+    <main class="shell content">
+      {{ content }}
+    </main>
+    <footer class="shell site-footer">
+      <a href="https://github.com/ericchansen/foundry-agents">View the lab repository on GitHub</a>
+    </footer>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+      mermaid.initialize({ startOnLoad: false });
+      const diagrams = [...document.querySelectorAll("pre > code.language-mermaid")]
+        .map((code) => {
+          const diagram = document.createElement("pre");
+          diagram.className = "mermaid";
+          diagram.textContent = code.textContent;
+          code.parentElement.replaceWith(diagram);
+          return diagram;
+        });
+
+      if (diagrams.length) {
+        await mermaid.run({ nodes: diagrams });
+      }
+    </script>
+  </body>
+</html>
