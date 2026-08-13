@@ -11,6 +11,7 @@ az --version
 azd version
 azd ext list --installed
 docker version
+.\scripts\use-latest-azd.ps1
 .\scripts\check-prerequisites.ps1
 ```
 

@@ -83,6 +83,13 @@ azd ext install microsoft.foundry
 azd ext upgrade microsoft.foundry
 ```
 
+On a Windows machine with more than one `azd` installation, activate the newest
+one for the current PowerShell session before rerunning the check:
+
+```powershell
+.\scripts\use-latest-azd.ps1
+```
+
 Authenticate after the tools are ready:
 
 ```powershell
