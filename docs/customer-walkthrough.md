@@ -39,6 +39,7 @@ because they need to control the runtime or supply a container image.
 - Which Foundry project and model deployment will it use?
 - Which downstream Azure resources must the agent call?
 - Which RBAC roles must be assigned to the dedicated agent identity?
+- Does the Foundry project identity have pull access to the image registry?
 - Are there non-Azure APIs that require project connections or secrets?
 - Does the runtime require outbound internet or private network access?
 
@@ -79,7 +80,8 @@ image: myregistry.azurecr.io/agents/my-agent@sha256:<digest>
 The customer must arrange:
 
 - Developer access for the selected build or push path.
-- Pull access for the dedicated hosted-agent identity.
+- Pull access for the Foundry project identity and a managed-identity ACR
+  project connection.
 - Network reachability from the Foundry runtime to a private ACR.
 
 See [Microsoft's ACR deployment guide][acr-docs] for the current role matrix and

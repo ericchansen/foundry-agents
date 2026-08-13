@@ -43,4 +43,6 @@ services:
         memory: 1Gi
 
 infra:
-  provider: microsoft.foundry
+  provider: bicep
+  path: ./infra
+  module: main

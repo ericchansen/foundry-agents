@@ -1,5 +1,10 @@
 # Microsoft Foundry custom-image hosted agent lab
 
+> **Learning this topic? Start with [COURSE.md](COURSE.md).** The course is an
+> instructor-led sequence with predictions, learner-performed commands,
+> troubleshooting exercises, and teach-back checkpoints. This README is the
+> compact implementation reference.
+
 This repository is a hands-on lab for packaging Python agent code as a custom
 Linux container image and deploying that image as a Microsoft Foundry hosted
 agent.
@@ -16,8 +21,8 @@ By completing the lab, you will be able to explain and demonstrate:
    and container image.
 2. The hosted-agent container contract: Linux `amd64`, port `8088`, a declared
    protocol, and a platform health endpoint.
-3. How the container uses its dedicated Microsoft Entra agent identity through
-   `DefaultAzureCredential`.
+3. How the project identity authorizes image pulls while the container uses its
+   dedicated Microsoft Entra agent identity through `DefaultAzureCredential`.
 4. How `azd` builds a Dockerfile, pushes the image to Azure Container Registry
    (ACR), creates an agent version, and routes traffic to it.
 5. How the workflow changes when a customer supplies a prebuilt image in an
@@ -32,8 +37,9 @@ flowchart LR
     container --> protocol[Responses protocol adapter]
     protocol --> logic[Your Python agent logic]
     logic --> project[Foundry project model endpoint]
-    identity[Dedicated agent identity] -. authenticates .-> project
-    acr[Azure Container Registry] -. image pull .-> container
+    runtimeIdentity[Dedicated agent identity] -. authenticates .-> project
+    projectIdentity[Foundry project identity] -. authorizes pull .-> acr[Azure Container Registry]
+    acr -. supplies image .-> container
 ```
 
 Foundry manages the public endpoint, scaling, session lifecycle, and agent
@@ -45,6 +51,7 @@ See the [hosted-agent deployment contract][deploy-docs].
 | Path | Purpose |
 | --- | --- |
 | `azure.yaml` | Declares the Foundry project, model, custom-image agent, protocol, and resources. |
+| `infra/` | Provisions the durable Foundry, ACR, monitoring, connection, and RBAC graph. |
 | `src/agent/main.py` | Implements the Responses protocol and calls the Foundry model endpoint. |
 | `src/agent/Dockerfile` | Builds the Linux `amd64` image that Foundry runs. |
 | `scripts/check-prerequisites.ps1` | Checks the local toolchain without changing it. |
@@ -101,6 +108,9 @@ Trace the following contract:
 - The manifest supplies the model deployment name.
 - `DefaultAzureCredential` uses your developer identity locally and the
   dedicated agent identity after deployment.
+- The Foundry project identity, not the dedicated runtime identity, is the
+  managed-identity credential on the ACR project connection and receives
+  `AcrPull`.
 
 Do not put secrets in the Dockerfile, image, or `azure.yaml`. Assign the agent
 identity RBAC access to any external Azure resources it must call.
@@ -129,9 +139,11 @@ Azure credentials in the container. The deployed agent never enables echo mode.
 
 ## Lab 3: Provision and deploy
 
-The checked-in `azure.yaml` provisions a learning environment with a Foundry
-project, a `gpt-5.4-mini` deployment, and the hosted agent. Confirm that the
-model and quota are available in your selected region before provisioning.
+The checked-in Bicep provisions a learning environment with a Foundry account
+and project, a `gpt-5.4-mini` deployment, ACR, Log Analytics, Application
+Insights, project connections, and scoped RBAC. The Foundry extension then
+builds and deploys the hosted agent. Confirm that the model and quota are
+available in your selected region before provisioning.
 
 Create an `azd` environment and deploy:
 
@@ -198,9 +210,10 @@ customer image uses a different path:
    ```
 
 For a private or centrally managed ACR, the developer needs the appropriate
-push or ACR Tasks role for the chosen build path. The hosted agent's identity
-always needs image pull access; `azd deploy` normally grants it. Review the
-[private ACR deployment guidance][acr-docs] before a customer deployment.
+push or ACR Tasks role for the chosen build path. The Foundry project identity
+needs image pull access and must be used by the project's managed-identity ACR
+connection. Review the [private ACR deployment guidance][acr-docs] before a
+customer deployment.
 
 ## Lab 5: Explain the identity flow
 
@@ -243,9 +256,13 @@ that project. Delete unused hosted-agent versions and images separately.
 - [`azure.yaml` reference][yaml-docs]
 - [Deploy from a private or existing ACR][acr-docs]
 - [Python Responses protocol package][responses-docs]
+- [Foundry Bicep resource reference][foundry-bicep-docs]
+- [Azure built-in roles][roles-docs]
 
 [deploy-docs]: https://learn.microsoft.com/azure/foundry/agents/how-to/deploy-hosted-agent
 [own-code-docs]: https://learn.microsoft.com/azure/foundry/agents/quickstarts/quickstart-deploy-own-code
 [yaml-docs]: https://learn.microsoft.com/azure/foundry/agents/concepts/azure-yaml-reference
 [acr-docs]: https://learn.microsoft.com/azure/foundry/agents/how-to/deploy-hosted-agent-private-azure-container-registry
 [responses-docs]: https://learn.microsoft.com/python/api/overview/azure/ai-agentserver-responses-readme
+[foundry-bicep-docs]: https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects
+[roles-docs]: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles
