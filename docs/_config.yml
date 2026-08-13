@@ -2,6 +2,7 @@ title: Foundry hosted-agent lab
 description: A practical reference for building and operating custom-image Microsoft Foundry hosted agents.
 baseurl: "/foundry-agents"
 markdown: kramdown
+permalink: pretty
 defaults:
   - scope:
       path: ""
