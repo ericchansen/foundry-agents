@@ -1,3 +1,8 @@
+---
+title: Command cheat sheet
+description: Commands for building, deploying, invoking, and diagnosing a Foundry hosted agent.
+---
+
 # Hosted-agent command cheat sheet
 
 Use this after completing the relevant lesson. During a lesson, predict the
@@ -24,8 +29,10 @@ docker build --platform linux/amd64 `
 
 .\scripts\test-image.ps1
 
+{% raw %}
 docker image inspect custom-image-hosted-agent-lab:local `
   --format "OS={{.Os}} Arch={{.Architecture}} User={{.Config.User}}"
+{% endraw %}
 ```
 
 ## Direct Bicep

@@ -1,3 +1,8 @@
+---
+title: Troubleshooting playbook
+description: Diagnose Foundry hosted-agent failures from code through endpoint routing.
+---
+
 # Hosted-agent troubleshooting playbook
 
 ## Principle
