@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+requiredVersions:
+  azd: ">=1.27.1"
+  extensions:
+    azure.ai.agents: ">=1.0.0-beta.8"
+    azure.ai.projects: ">=1.0.0-beta.4"
+
+name: prebuilt-hosted-agent-example
+
+services:
+  ai-project:
+    host: azure.ai.project
+    endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
+
+  prebuilt-agent:
+    host: azure.ai.agent
+    uses:
+      - ai-project
+    kind: hosted
+    name: prebuilt-custom-image-agent
+    description: A hosted agent deployed from a prebuilt ACR image.
+    image: ${PREBUILT_AGENT_IMAGE}
+    protocols:
+      - protocol: responses
+        version: 2.0.0
+    env:
+      FOUNDRY_MODEL_NAME: ${FOUNDRY_MODEL_NAME}
+    container:
+      resources:
+        cpu: "0.5"
+        memory: 1Gi

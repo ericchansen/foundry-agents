@@ -1,9 +1,13 @@
 [CmdletBinding()]
 param(
     [string] $ImageName = "custom-image-hosted-agent-lab:local",
+    [string] $ProjectPath = ".\src\agent",
     [ValidateRange(1, 65535)]
     [int] $Port = 8088,
-    [string] $PipIndexUrl
+    [string] $PipIndexUrl,
+    [string] $RequestText = "Explain the hosted-agent container boundary.",
+    [string] $ExpectedText = "Echo: Explain the hosted-agent container boundary.",
+    [switch] $BuildOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -30,6 +34,7 @@ try {
         }
     }
 
+    $resolvedProjectPath = (Resolve-Path $ProjectPath).Path
     $buildArguments = @(
         "build",
         "--platform", "linux/amd64",
@@ -38,11 +43,31 @@ try {
     if ($PipIndexUrl) {
         $buildArguments += @("--build-arg", "PIP_INDEX_URL=$PipIndexUrl")
     }
-    $buildArguments += ".\src\agent"
+    $buildArguments += $resolvedProjectPath
 
     & docker @buildArguments
     if ($LASTEXITCODE -ne 0) {
         throw "Docker build failed."
+    }
+
+    $metadata = & docker image inspect $ImageName | ConvertFrom-Json |
+        Select-Object -First 1
+    if ($metadata.Os -ne "linux" -or $metadata.Architecture -ne "amd64") {
+        throw "Image must be linux/amd64, found $($metadata.Os)/$($metadata.Architecture)."
+    }
+    if (-not $metadata.Config.User -or $metadata.Config.User -in @("root", "0")) {
+        throw "Image must declare a non-root runtime user."
+    }
+    if (-not $metadata.Config.ExposedPorts.PSObject.Properties["8088/tcp"]) {
+        throw "Image must expose container port 8088."
+    }
+    if (-not $metadata.Config.Healthcheck) {
+        throw "Image must declare a health check."
+    }
+
+    if ($BuildOnly) {
+        Write-Host "Image metadata verified: linux/amd64, non-root, port 8088, and health check." -ForegroundColor Green
+        return
     }
 
     $containerId = (& docker run --detach `
@@ -77,7 +102,7 @@ try {
     }
 
     $request = @{
-        input = "Explain the hosted-agent container boundary."
+        input = $RequestText
         stream = $false
     } | ConvertTo-Json
 
@@ -88,7 +113,7 @@ try {
         -Body $request
 
     $serialized = $response | ConvertTo-Json -Depth 20
-    if ($serialized -notmatch "Echo: Explain the hosted-agent container boundary\.") {
+    if ($serialized -notmatch [regex]::Escape($ExpectedText)) {
         throw "The Responses endpoint returned an unexpected payload: $serialized"
     }
 
