@@ -48,6 +48,8 @@ if (Test-Command "python") {
     Test-MinimumVersion "Python" (& python --version 2>&1 | Out-String) ([version] "3.13.0")
 }
 
+& "$PSScriptRoot\use-latest-azd.ps1"
+
 if (Test-Command "azd") {
     Test-MinimumVersion "azd" (& azd version 2>&1 | Select-Object -First 1 | Out-String) ([version] "1.27.1")
 
