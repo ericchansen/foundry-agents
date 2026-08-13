@@ -39,8 +39,8 @@ Trace these values:
 
 | Value | Local source | Hosted source |
 | --- | --- | --- |
-| Project endpoint | Shell or `azd ai agent run` | Platform injection |
-| Model deployment name | Shell or `azd` environment | Agent environment configuration |
+| Project endpoint | Shell or `azd ai agent run` | Platform injection (`FOUNDRY_PROJECT_ENDPOINT`) |
+| Model deployment name | Shell or `azd` environment | Safe agent environment configuration (`MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME`) |
 | Credential | Developer credential chain | Dedicated agent identity |
 
 The image contains code that asks for a credential. It does not contain the
@@ -52,7 +52,7 @@ Set the project and model values in the current shell:
 
 ```powershell
 $env:FOUNDRY_PROJECT_ENDPOINT = "https://<account>.services.ai.azure.com/api/projects/<project>"
-$env:FOUNDRY_MODEL_NAME = "<model-deployment-name>"
+$env:MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME = "<model-deployment-name>"
 ```
 
 Authenticate:

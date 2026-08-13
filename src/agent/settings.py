@@ -40,8 +40,8 @@ class Settings:
         local_echo_mode = _read_bool("LOCAL_ECHO_MODE")
         project_endpoint = _first_value("FOUNDRY_PROJECT_ENDPOINT")
         model_deployment_name = _first_value(
-            "FOUNDRY_MODEL_NAME",
             "MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME",
+            "FOUNDRY_MODEL_NAME",
             "AZURE_AI_MODEL_DEPLOYMENT_NAME",
         )
 
@@ -50,7 +50,7 @@ class Settings:
             if not project_endpoint:
                 missing.append("FOUNDRY_PROJECT_ENDPOINT")
             if not model_deployment_name:
-                missing.append("FOUNDRY_MODEL_NAME")
+                missing.append("MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME")
             if missing:
                 joined = ", ".join(missing)
                 raise RuntimeError(f"Missing required environment variable(s): {joined}.")

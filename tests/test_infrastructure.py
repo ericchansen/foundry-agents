@@ -13,6 +13,26 @@ class InfrastructureTests(unittest.TestCase):
             manifest,
             r"(?m)^infra:\n  provider: bicep\n  path: \./infra\n  module: main$",
         )
+        parameters = (INFRA / "main.bicepparam").read_text(encoding="utf-8")
+        self.assertIn(
+            "readEnvironmentVariable('AI_PROJECT_DEPLOYMENTS', '[]')",
+            parameters,
+        )
+        self.assertIn("readEnvironmentVariable('AZURE_LOCATION')", parameters)
+        self.assertFalse((INFRA / "main.parameters.json").exists())
+
+    def test_agent_manifests_use_safe_model_configuration(self):
+        manifests = {
+            ROOT / "azure.yaml",
+            ROOT / "examples" / "03-prebuilt-image" / "azure.yaml",
+        }
+        for manifest in manifests:
+            source = manifest.read_text(encoding="utf-8")
+            self.assertIn(
+                "MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME:",
+                source,
+            )
+            self.assertNotIn("FOUNDRY_MODEL_NAME:", source)
 
     def test_expected_resource_graph_is_declared(self):
         source = "\n".join(

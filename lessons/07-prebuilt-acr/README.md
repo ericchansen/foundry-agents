@@ -43,7 +43,7 @@ Set the example environment values and deploy:
 
 ```powershell
 azd env set FOUNDRY_PROJECT_ENDPOINT <project-endpoint>
-azd env set FOUNDRY_MODEL_NAME <model-deployment>
+azd env set MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME <model-deployment>
 azd env set PREBUILT_AGENT_IMAGE `
   <registry>.azurecr.io/agents/custom-image-agent@sha256:<digest>
 azd env set AZD_AGENT_SKIP_ACR true
