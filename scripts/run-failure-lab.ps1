@@ -70,6 +70,35 @@ function Get-DockerLogs {
     }
 }
 
+function Wait-DockerContainerExit {
+    param(
+        [Parameter(Mandatory)]
+        [string] $Name,
+
+        [int] $TimeoutSeconds = 30
+    )
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $state = $null
+    do {
+        $inspectOutput = & docker inspect --format "{{.State.Status}}" $Name 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            $inspectError = ($inspectOutput | Out-String).Trim()
+            throw "Docker failed to inspect container '$Name' while waiting for it to exit: $inspectError"
+        }
+        $state = ($inspectOutput | Out-String).Trim()
+
+        if ($state -in @("exited", "dead")) {
+            return
+        }
+
+        Start-Sleep -Milliseconds 250
+    }
+    while ((Get-Date) -lt $deadline)
+
+    throw "Container '$Name' did not exit within $TimeoutSeconds seconds; last observed state: $state."
+}
+
 try {
     if (-not $PipIndexUrl -and (Get-Command python -ErrorAction SilentlyContinue)) {
         foreach ($scope in @("--global", "--user", "--site")) {
@@ -180,7 +209,7 @@ try {
                 throw "Docker failed to start the missing-configuration fixture."
             }
             $containerStarted = $true
-            Start-Sleep -Seconds 2
+            Wait-DockerContainerExit -Name $containerName
 
             $logs = Get-DockerLogs -Name $containerName
             if ($logs -notmatch "Missing required environment variable") {
