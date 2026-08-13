@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+requiredVersions:
+  azd: ">=1.27.1"
+  extensions:
+    azure.ai.agents: ">=1.0.0-beta.8"
+    azure.ai.projects: ">=1.0.0-beta.4"
+
+name: custom-image-hosted-agent-lab
+
+services:
+  ai-project:
+    host: azure.ai.project
+    deployments:
+      - name: gpt-5.4-mini
+        model:
+          format: OpenAI
+          name: gpt-5.4-mini
+          version: "2026-03-17"
+        sku:
+          name: GlobalStandard
+          capacity: 10
+
+  custom-image-agent:
+    host: azure.ai.agent
+    project: src/agent
+    language: docker
+    uses:
+      - ai-project
+    kind: hosted
+    name: custom-image-hosted-agent-lab
+    displayName: Custom image hosted agent lab
+    description: A learning agent packaged as a custom Linux container image.
+    startupCommand: python main.py
+    protocols:
+      - protocol: responses
+        version: 2.0.0
+    env:
+      FOUNDRY_MODEL_NAME: gpt-5.4-mini
+    container:
+      resources:
+        cpu: "0.5"
+        memory: 1Gi
+
+infra:
+  provider: microsoft.foundry
