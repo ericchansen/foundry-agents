@@ -65,7 +65,8 @@ endpoint.
 
 ## Scenario D: Missing model configuration
 
-The container exits with a missing `FOUNDRY_MODEL_NAME` error.
+The container exits with a missing `MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME`
+error.
 
 Find where the value should be declared for local runs and deployed runs.
 

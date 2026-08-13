@@ -20,18 +20,28 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual("", settings.model_deployment_name)
 
     def test_model_aliases_are_supported(self):
-        environment = {
-            "FOUNDRY_PROJECT_ENDPOINT": "https://example.test/api/projects/lab",
-            "AZURE_AI_MODEL_DEPLOYMENT_NAME": "test-model",
-        }
+        for name in (
+            "MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME",
+            "FOUNDRY_MODEL_NAME",
+            "AZURE_AI_MODEL_DEPLOYMENT_NAME",
+        ):
+            with self.subTest(name=name):
+                environment = {
+                    "FOUNDRY_PROJECT_ENDPOINT": "https://example.test/api/projects/lab",
+                    name: "test-model",
+                }
 
-        with patch.dict(os.environ, environment, clear=True):
-            settings = Settings.from_env()
+                with patch.dict(os.environ, environment, clear=True):
+                    settings = Settings.from_env()
 
-        self.assertEqual("test-model", settings.model_deployment_name)
+                self.assertEqual("test-model", settings.model_deployment_name)
 
     def test_missing_project_endpoint_is_reported(self):
-        with patch.dict(os.environ, {"FOUNDRY_MODEL_NAME": "test-model"}, clear=True):
+        with patch.dict(
+            os.environ,
+            {"MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME": "test-model"},
+            clear=True,
+        ):
             with self.assertRaisesRegex(RuntimeError, "FOUNDRY_PROJECT_ENDPOINT"):
                 Settings.from_env()
 
@@ -41,7 +51,10 @@ class SettingsTests(unittest.TestCase):
         }
 
         with patch.dict(os.environ, environment, clear=True):
-            with self.assertRaisesRegex(RuntimeError, "FOUNDRY_MODEL_NAME"):
+            with self.assertRaisesRegex(
+                RuntimeError,
+                "MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME",
+            ):
                 Settings.from_env()
 
     def test_invalid_echo_mode_is_reported(self):

@@ -25,7 +25,7 @@ services:
       - protocol: responses
         version: 2.0.0
     env:
-      FOUNDRY_MODEL_NAME: ${FOUNDRY_MODEL_NAME}
+      MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME: ${MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME}
     container:
       resources:
         cpu: "0.5"

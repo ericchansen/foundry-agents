@@ -111,8 +111,8 @@ Trace the following contract:
 - The server listens on port `8088`.
 - `azure-ai-agentserver-responses` exposes `/responses` and `/readiness`.
 - `azure.yaml` declares Responses protocol version `2.0.0`.
-- Foundry injects `FOUNDRY_PROJECT_ENDPOINT`.
-- The manifest supplies the model deployment name.
+- Foundry injects the reserved `FOUNDRY_PROJECT_ENDPOINT`.
+- The manifest supplies the model deployment name through the safe `MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME` application setting.
 - `DefaultAzureCredential` uses your developer identity locally and the
   dedicated agent identity after deployment.
 - The Foundry project identity, not the dedicated runtime identity, is the
@@ -186,9 +186,11 @@ services:
     endpoint: https://<account>.services.ai.azure.com/api/projects/<project>
 ```
 
-Also set `FOUNDRY_MODEL_NAME` under the agent's `env` map to the deployment name
-that already exists in that project. You need the **Foundry Project Manager**
-role at project scope to deploy a hosted agent.
+Set `MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME` under the agent's `env` map to
+the deployment name that already exists in that project. `FOUNDRY_*` and
+`AGENT_*` names are platform-reserved, except for values Foundry injects such
+as `FOUNDRY_PROJECT_ENDPOINT`. You need the **Foundry Project Manager** role
+at project scope to deploy a hosted agent.
 
 ## Lab 4: Deploy a customer-supplied prebuilt image
 
