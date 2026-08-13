@@ -62,6 +62,18 @@ class CourseStructureTests(unittest.TestCase):
         for path in expected:
             self.assertTrue(path.is_file(), f"Missing failure fixture: {path}")
 
+    def test_missing_configuration_fixture_waits_for_container_exit(self):
+        fixture = (ROOT / "scripts" / "run-failure-lab.ps1").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("function Wait-DockerContainerExit", fixture)
+        self.assertIn(
+            'Wait-DockerContainerExit -Name $containerName',
+            fixture,
+        )
+        self.assertIn("$inspectOutput = & docker inspect", fixture)
+        self.assertIn("last observed state: $state", fixture)
+
     def test_toolchain_selector_exists(self):
         selector = ROOT / "scripts" / "use-latest-azd.ps1"
         self.assertTrue(selector.is_file())
