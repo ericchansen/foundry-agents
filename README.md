@@ -46,6 +46,36 @@ Foundry manages the public endpoint, scaling, session lifecycle, and agent
 identity. Your image owns the protocol adapter, dependencies, and agent logic.
 See the [hosted-agent deployment contract][deploy-docs].
 
+## Hosted agent requirements
+
+Use this checklist before deploying a custom image. The detailed, browser-friendly
+version is available on the documentation site: [Hosted agent
+requirements](docs/hosted-agent-requirements.md).
+
+1. Build a Linux `amd64` OCI container image.
+2. Declare a supported protocol and include its handler. This lab declares
+   **Responses 2.0** in `azure.yaml` and uses
+   `azure-ai-agentserver-responses` as the protocol handler.
+3. Listen internally on port `8088`. The SDK provides `/readiness`; Foundry
+   uses that endpoint, so do not expose a public inbound port.
+4. Store the image in Azure Container Registry (ACR) and authorize the Foundry
+   project or platform identity to pull it.
+5. Give the dedicated runtime agent identity only the RBAC roles needed for
+   downstream Azure resources.
+6. Supply configuration and secrets securely. Keep platform-reserved
+   `FOUNDRY_*` names for Foundry, and use Foundry connections for supported
+   service integrations rather than embedding credentials.
+7. Configure observability so you can inspect deployments, requests, and
+   failures.
+8. Pin production deployments to a fixed image digest.
+
+You do **not** need a public web server, a hand-built health endpoint, or API
+keys embedded in the image. Tags such as `v1.4.0` are useful, and can be
+mutable, human-readable release labels. A production deployment should select
+the exact artifact with an immutable digest, for example
+`myregistry.azurecr.io/agents/lab:v1.4.0@sha256:<digest>` or
+`myregistry.azurecr.io/agents/lab@sha256:<digest>`.
+
 ## Repository map
 
 | Path | Purpose |

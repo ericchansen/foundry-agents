@@ -43,6 +43,14 @@ JSON payload, such as a webhook or non-conversational workflow. Use
 **Invocations (WebSocket)** for bidirectional real-time scenarios such as voice.
 One hosted agent can expose more than one supported protocol.
 
+## Deployment checklist
+
+Before you deploy a custom image, work through the
+[hosted agent requirements]({{ '/hosted-agent-requirements/' | relative_url }}).
+The checklist covers the image, protocol handler, internal readiness endpoint,
+ACR pull authorization, runtime RBAC, configuration, observability, and
+digest-pinned production deployments.
+
 ## Identity model
 
 Two identities have distinct jobs:

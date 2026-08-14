@@ -13,6 +13,7 @@ workflow that accompany the hands-on course.
 
 | Goal | Read |
 | --- | --- |
+| Check a custom image before deployment | [Hosted agent requirements]({{ '/hosted-agent-requirements/' | relative_url }}) |
 | Decide whether hosted agents fit the workload | [Hosted agents]({{ '/hosted-agents/' | relative_url }}) |
 | Understand platform, image, protocol, and identity responsibilities | [Mental model]({{ '/mental-model/' | relative_url }}) |
 | Build, provision, deploy, invoke, and inspect an agent | [Command cheat sheet]({{ '/cheat-sheet/' | relative_url }}) |
