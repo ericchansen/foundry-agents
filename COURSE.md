@@ -82,11 +82,29 @@ Completion is based on evidence, not on reading.
 
 ## Durable references
 
+- [Hosted agent requirements](docs/hosted-agent-requirements.md) -- read this
+  checklist before building or deploying an image
 - [Mental model](docs/mental-model.md)
 - [Command cheat sheet](docs/cheat-sheet.md)
 - [Troubleshooting playbook](docs/troubleshooting-playbook.md)
 - [Customer walkthrough](docs/customer-walkthrough.md)
 - [Answer key](lessons/ANSWER_KEY.md) -- use only after attempting an exercise
+
+## Hosted agent requirements
+
+Before Module 3, be able to explain the hosted-agent boundary: a Linux `amd64`
+OCI image, Responses 2.0 (for this lab) plus its protocol handler, internal
+port `8088`, and the SDK-provided `/readiness` endpoint. The image belongs in
+ACR, the Foundry project or platform identity needs pull authorization, and the
+dedicated runtime identity needs least-privilege RBAC for downstream resources.
+
+Configuration and secrets stay outside the image: preserve platform-reserved
+`FOUNDRY_*` names and use Foundry connections where supported. Plan
+observability before deploying, and pin production releases to an image
+`@sha256` digest. You do not need a public web server, a custom health endpoint,
+or API keys embedded in the container. See [Hosted agent
+requirements](docs/hosted-agent-requirements.md) for the complete checklist and
+the distinction between mutable release tags and immutable deployment digests.
 
 ## Ground rules for the Azure environment
 
