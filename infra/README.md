@@ -50,16 +50,35 @@ permissions, such as Owner or Role Based Access Control Administrator.
 
 Set `ENABLE_GITHUB_ACTIONS_IDENTITY=true` before `azd provision` to create the
 dedicated user-assigned identity. Its federated credential accepts only the
-configured main-branch GitHub OIDC subject, with issuer
+exact `GITHUB_ACTIONS_FEDERATED_SUBJECT` value. Its default is this
+repository's current immutable main-branch subject,
+`repo:ericchansen@5395779/foundry-hosted-agents@1333280174:ref:refs/heads/main`, with issuer
 `https://token.actions.githubusercontent.com` and audience
 `api://AzureADTokenExchange`. The template outputs its client and principal IDs
 without changing the local developer principal assignments.
 
-Repository renames or transfers can change the emitted OIDC subject prefix even
-when the subject includes immutable owner and repository IDs. Before the next
-deployment after either event, inspect GitHub's OIDC customization, update this
-federated credential and the live Azure credential to the returned subject, then
-run a manual workflow dispatch.
+### GitHub OIDC subject maintenance
+
+The federated subject is repository metadata, not a stable guess. Re-query it
+after a repository rename, transfer, or a change to GitHub's OIDC subject
+customization:
+
+```powershell
+gh api repos/<owner>/<repo>/actions/oidc/customization/sub
+```
+
+Use the returned `sub_claim_prefix` as the source of truth. Append
+`:ref:refs/heads/<branch>` for a branch workflow or
+`:environment:<environment>` for an environment workflow, then set the exact
+resulting value before provisioning:
+
+```powershell
+azd env set GITHUB_ACTIONS_FEDERATED_SUBJECT '<sub_claim_prefix>:ref:refs/heads/<branch>'
+```
+
+Verify the value against an OIDC token from the target workflow before applying
+it. The federated credential matches subjects exactly; a branch, environment,
+rename, transfer, or claim-customization change requires an updated value.
 
 ## Important outputs
 

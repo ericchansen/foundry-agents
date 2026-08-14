@@ -63,6 +63,7 @@ class InfrastructureTests(unittest.TestCase):
             INFRA / "modules" / "github-actions-identity.bicep"
         ).read_text(encoding="utf-8")
         main = (INFRA / "main.bicep").read_text(encoding="utf-8")
+        parameters = (INFRA / "main.bicepparam").read_text(encoding="utf-8")
 
         self.assertIn("Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31", identity)
         self.assertIn(
@@ -70,9 +71,18 @@ class InfrastructureTests(unittest.TestCase):
             identity,
         )
         self.assertIn("https://token.actions.githubusercontent.com", identity)
+        self.assertIn("param federatedSubject string", identity)
+        self.assertIn("subject: federatedSubject", identity)
+        self.assertNotIn("repo:ericchansen@5395779/foundry-agents@1333280174:ref:refs/heads/main", identity)
+        self.assertIn("param githubActionsFederatedSubject string", main)
+        self.assertIn("federatedSubject: githubActionsFederatedSubject", main)
         self.assertIn(
-            "repo:ericchansen@5395779/foundry-agents@1333280174:ref:refs/heads/main",
-            identity,
+            "repo:ericchansen@5395779/foundry-hosted-agents@1333280174:ref:refs/heads/main",
+            main,
+        )
+        self.assertIn(
+            "readEnvironmentVariable('GITHUB_ACTIONS_FEDERATED_SUBJECT'",
+            parameters,
         )
         self.assertIn("api://AzureADTokenExchange", identity)
         self.assertIn("enableGithubActionsIdentity", main)
