@@ -31,7 +31,7 @@ identity pulls it, and which identity the container uses after it starts.
 
 ## Perform
 
-From [`examples/04-python-sdk-deployment`](https://github.com/ericchansen/foundry-agents/tree/main/examples/04-python-sdk-deployment),
+From [`examples/04-python-sdk-deployment`](https://github.com/ericchansen/foundry-hosted-agents/tree/main/examples/04-python-sdk-deployment),
 set the project endpoint, digest-pinned image reference, and model deployment.
 Then run:
 

@@ -20,7 +20,7 @@ image by digest.
 
 ## Example
 
-Use [`examples/03-prebuilt-image`](https://github.com/ericchansen/foundry-agents/tree/main/examples/03-prebuilt-image).
+Use [`examples/03-prebuilt-image`](https://github.com/ericchansen/foundry-hosted-agents/tree/main/examples/03-prebuilt-image).
 
 ## Diagnose
 
@@ -71,6 +71,13 @@ Confirm that the release pipeline has ACR push permission, uses OIDC workload
 identity federation, and has the **Foundry Project Manager** role required to
 create and promote the agent version.
 
+For a local Docker data-plane push to this lab's Legacy/RBAC Registry Permissions
+registry, the release identity needs `AcrPush`; `Tasks Contributor` is for ACR
+Tasks and does not authorize that push. For an ABAC-enabled registry, use
+`Container Registry Repository Writer`. See the [GitHub Actions deployment
+guide]({{ '/github-actions-hosted-agent/#choose-the-acr-data-plane-role' | relative_url }})
+before assigning the CI identity.
+
 ## Exercise
 
 Move the `v1` tag to a different image without changing the digest-pinned
@@ -89,5 +96,6 @@ responsibilities remain outside Foundry.
 
 ## Checkpoint
 
-Advance only when the digest-pinned version is active and you can distinguish
-developer push access from project identity pull access.
+Advance only when the digest-pinned version is active, you can distinguish
+developer push access from project identity pull access, and you can select the
+correct CI role for the registry permissions mode.

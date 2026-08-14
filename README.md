@@ -35,4 +35,6 @@ Build and invoke the image in deterministic local echo mode:
 ```
 
 For architecture, requirements, deployment paths, commands, and troubleshooting,
-use the [implementation reference](https://ericchansen.github.io/foundry-agents/implementation-reference/).
+use the [implementation reference](https://ericchansen.github.io/foundry-agents/implementation-reference/). To configure safe GitHub Actions OIDC releases,
+including existing-environment identity bootstrap and direct Responses evidence,
+use the [hosted-agent CI/CD guide](https://ericchansen.github.io/foundry-agents/github-actions-hosted-agent/).
