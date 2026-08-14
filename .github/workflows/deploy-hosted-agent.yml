@@ -133,12 +133,58 @@ jobs:
 
       - name: Smoke test Responses protocol
         shell: bash
+        env:
+          FOUNDRY_PROJECT_ENDPOINT: ${{ vars.FOUNDRY_PROJECT_ENDPOINT }}
         run: |
           set -euo pipefail
+          request_file="$(mktemp)"
           response_file="$(mktemp)"
-          azd ai agent invoke "$AGENT_NAME" "$AGENT_SMOKE_PROMPT" --new-session --no-prompt --output raw > "$response_file"
-          if ! grep -q '[^[:space:]]' "$response_file"; then
-            echo "::error::The Responses-protocol smoke test returned an empty response."
+          trap 'rm -f "$request_file" "$response_file"' EXIT
+
+          access_token="$(az account get-access-token --resource https://ai.azure.com --query accessToken --output tsv)"
+          if [[ -z "$access_token" ]]; then
+            echo "::error::Azure CLI did not return an Azure AI access token."
             exit 1
           fi
-          cat "$response_file"
+
+          jq --null-input --arg input "$AGENT_SMOKE_PROMPT" '{input: $input, store: true}' > "$request_file"
+          agent_endpoint="${FOUNDRY_PROJECT_ENDPOINT%/}/agents/${AGENT_NAME}/endpoint/protocols/openai/responses?api-version=v1"
+
+          if ! http_status="$(curl --silent --show-error --output "$response_file" --write-out '%{http_code}' --request POST "$agent_endpoint" --header "Authorization: Bearer $access_token" --header 'Content-Type: application/json' --data-binary "@$request_file")"; then
+            echo "::error::The Responses-protocol smoke request could not reach the agent endpoint."
+            [[ -s "$response_file" ]] && cat "$response_file"
+            exit 1
+          fi
+
+          if [[ ! "$http_status" =~ ^2 ]]; then
+            echo "::error::The Responses-protocol smoke request returned HTTP $http_status."
+            cat "$response_file"
+            exit 1
+          fi
+
+          if ! jq -e '
+            .status == "completed" and
+            any(
+              .output[]?;
+              .type == "message" and
+              .role == "assistant" and
+              any(
+                .content[]?;
+                .type == "output_text" and
+                (.text | type == "string") and
+                (.text | length > 0)
+              )
+            )
+          ' "$response_file" > /dev/null; then
+            echo "::error::The Responses-protocol smoke request did not complete with assistant output."
+            cat "$response_file"
+            exit 1
+          fi
+
+          jq -r '
+            .output[]?
+            | select(.type == "message" and .role == "assistant")
+            | .content[]?
+            | select(.type == "output_text")
+            | .text
+          ' "$response_file"

@@ -12,7 +12,7 @@ section: reference
 run. It uses the root `azure.yaml`; it does not deploy the prebuilt-image
 example. The workflow serializes releases, validates the root agent image and
 checked-in Bicep, deploys with `azd`, displays agent status, and sends a fixed
-Responses-protocol smoke prompt.
+Responses-protocol request directly to the active agent endpoint.
 
 The workflow is intentionally excluded from documentation-only and
 infrastructure-only changes. It runs only when `azure.yaml`, `src/agent/`, or
@@ -59,10 +59,27 @@ It trusts only issuer `https://token.actions.githubusercontent.com` and audience
 `api://AzureADTokenExchange`.
 
 The identity receives **Foundry Project Manager** on the Foundry project and
-**Container Registry Tasks Contributor** on the associated ACR. Those are the
-same narrowly scoped build-and-agent roles already used by this infrastructure;
-the bootstrap does not grant subscription or resource-group Contributor and
-does not replace local developer role assignments.
+**AcrPush** on the associated ACR. `azd deploy` performs a local Docker build
+and data-plane image push, which requires `AcrPush`; Container Registry Tasks
+Contributor authorizes ACR tasks instead and does not authorize that push. The
+bootstrap does not grant subscription or resource-group Contributor and does
+not replace local developer role assignments.
+
+## Smoke-test diagnostics
+
+The release smoke test obtains an `https://ai.azure.com` access token through
+the OIDC-authenticated Azure CLI session, builds the Responses request with
+`jq`, and posts it to
+`$FOUNDRY_PROJECT_ENDPOINT/agents/$AGENT_NAME/endpoint/protocols/openai/responses?api-version=v1`.
+It retains the HTTP status and response body for diagnostics without printing
+the token, requires a 2xx response, then asserts `status` is `completed` and
+that an assistant `output_text` is present.
+
+This direct contract check avoids depending on `azd ai agent invoke`, whose
+client-side failure can otherwise obscure a successfully deployed endpoint.
+Treat release failures as layered: first distinguish the endpoint request from
+the CLI wrapper, then distinguish the local Docker data-plane push permission
+from ACR task-management permissions.
 
 ## Operating model and limitation
 
