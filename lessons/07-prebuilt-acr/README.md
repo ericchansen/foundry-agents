@@ -54,6 +54,9 @@ azd deploy
 
 Confirm the deployed agent version references the digest, not only the tag.
 Confirm which principal has pull access.
+Confirm that the release pipeline has ACR push permission, uses OIDC workload
+identity federation, and has the **Foundry Project Manager** role required to
+create and promote the agent version.
 
 ## Exercise
 
