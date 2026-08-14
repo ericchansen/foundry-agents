@@ -18,6 +18,9 @@ param foundryProjectName string
 @description('Container registry used for local Docker builds and data-plane image pushes.')
 param registryName string
 
+@description('Exact GitHub Actions OIDC subject trusted by this federated credential. Re-query and update it after a repository rename, transfer, or GitHub OIDC trust-model change.')
+param federatedSubject string
+
 var foundryProjectManagerRoleId = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   'eadc314b-1a2d-4efa-be10-5d325db5065e'
@@ -41,7 +44,7 @@ resource githubMainFederatedCredential 'Microsoft.ManagedIdentity/userAssignedId
       'api://AzureADTokenExchange'
     ]
     issuer: 'https://token.actions.githubusercontent.com'
-    subject: 'repo:ericchansen@5395779/foundry-agents@1333280174:ref:refs/heads/main'
+    subject: federatedSubject
   }
 }
 

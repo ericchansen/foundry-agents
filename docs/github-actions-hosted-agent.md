@@ -113,11 +113,17 @@ GitHub's current immutable-subject behavior can include owner and repository IDs
 gh api repos/<owner>/<repository>/actions/oidc/customization/sub
 ```
 
-Use the [GitHub OIDC reference](https://docs.github.com/actions/reference/security/oidc) to interpret the returned claim customization and configure the Azure federated credential for that subject. The traditional branch-scoped form is `repo:<owner>/<repository>:ref:refs/heads/<branch>`; immutable subject configurations can include immutable IDs as well.
+Use the returned `sub_claim_prefix` as the source of truth. Append `:ref:refs/heads/<branch>` for a branch workflow or `:environment:<environment>` for an environment workflow. The optional checked-in Bicep identity reads the exact value from `GITHUB_ACTIONS_FEDERATED_SUBJECT`, so set it before provisioning:
+
+```powershell
+azd env set GITHUB_ACTIONS_FEDERATED_SUBJECT '<sub_claim_prefix>:ref:refs/heads/<branch>'
+```
+
+Use the [GitHub OIDC reference](https://docs.github.com/actions/reference/security/oidc) to interpret the returned claim customization and configure the Azure federated credential for that exact subject. The traditional branch-scoped form is `repo:<owner>/<repository>:ref:refs/heads/<branch>`; immutable subject configurations can include immutable IDs as well.
 
 If the job does not declare a GitHub Environment, use a branch subject and trust only the release branch. If the job declares `environment: <name>`, GitHub uses an environment subject rather than the branch form. Protect that Environment with required reviewers and deployment branch/tag rules before making it a trust boundary. The [GitHub OIDC guidance for Azure](https://docs.github.com/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure) explains the claim and environment implications.
 
-> **Rename or transfer checkpoint:** A repository rename or transfer can change the emitted subject prefix even when immutable owner and repository IDs are included. Before the next deployment, re-run the GitHub OIDC customization query, compare the returned subject with the Azure federated credential, update the Azure credential when it differs, and prove the change with a manual workflow dispatch.
+> **Rename or transfer checkpoint:** A repository rename or transfer can change the emitted subject prefix even when immutable owner and repository IDs are included. Before the next deployment, re-run the GitHub OIDC customization query, update `GITHUB_ACTIONS_FEDERATED_SUBJECT` and the Azure federated credential when they differ, then prove the change with a manual workflow dispatch.
 
 ### Choose the ACR data-plane role
 

@@ -48,6 +48,9 @@ param resourceTokenSalt string = ''
 @description('Create the GitHub Actions OIDC deployment identity and its scoped role assignments.')
 param enableGithubActionsIdentity bool = false
 
+@description('Exact GitHub Actions OIDC federated subject for the deployment identity. Re-query and update it after a repository rename, transfer, or GitHub OIDC trust-model change.')
+param githubActionsFederatedSubject string = 'repo:ericchansen@5395779/foundry-hosted-agents@1333280174:ref:refs/heads/main'
+
 var effectiveResourceGroupName = empty(resourceGroupName)
   ? 'rg-${environmentName}'
   : resourceGroupName
@@ -88,6 +91,7 @@ module githubActionsIdentity './modules/github-actions-identity.bicep' = if (ena
     foundryAccountName: resources.outputs.accountName
     foundryProjectName: resources.outputs.projectName
     registryName: resources.outputs.acrName
+    federatedSubject: githubActionsFederatedSubject
   }
 }
 
