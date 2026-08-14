@@ -37,6 +37,13 @@ def read_front_matter(path):
 
 
 class CourseStructureTests(unittest.TestCase):
+    def test_pages_baseurl_matches_repository_name(self):
+        config = (ROOT / "docs" / "_config.yml").read_text(encoding="utf-8")
+        self.assertRegex(
+            config,
+            r'(?m)^baseurl:\s*["\']?/foundry-hosted-agents["\']?\s*$',
+        )
+
     def test_all_modules_exist(self):
         actual = {path.stem for path in MODULES.glob("*.md")}
         self.assertEqual(set(COURSE_SEQUENCE), actual)
