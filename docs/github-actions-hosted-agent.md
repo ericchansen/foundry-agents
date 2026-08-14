@@ -30,6 +30,8 @@ not put these values in repository files.
 | `AZURE_SUBSCRIPTION_ID` | Subscription ID containing the existing Foundry project and ACR. |
 | `AZURE_LOCATION` | Location of the existing Foundry environment. |
 | `AZURE_RESOURCE_GROUP` | Resource group containing the existing Foundry account, project, and ACR. |
+| `AZURE_CONTAINER_REGISTRY_ENDPOINT` | Existing ACR login server endpoint, such as `<registry>.azurecr.io`. |
+| `AZURE_CONTAINER_REGISTRY_RESOURCE_ID` | Existing ACR resource ID. |
 | `FOUNDRY_PROJECT_ENDPOINT` | Existing Foundry project endpoint. |
 | `AZURE_AI_PROJECT_ID` | Existing Foundry project resource ID. |
 | `FOUNDRY_MODEL_DEPLOYMENT_NAME` | Existing model deployment name used by the root agent. It must match the deployed project configuration. |
@@ -74,6 +76,13 @@ The workflow assumes the existing project, model deployment, ACR connection,
 and quota are healthy. It deliberately does not run `azd provision`, so it
 cannot repair missing infrastructure or grant additional permissions during a
 release.
+
+The root `custom-image-agent` service is a Docker source-build service. Each
+successful `azd deploy --no-prompt` rebuilds the image from `src/agent/`,
+publishes it to the configured existing ACR, and deploys the resulting image as
+the hosted-agent version. The ACR endpoint and resource ID variables are
+therefore required even though the workflow does not provision or modify the
+registry itself.
 
 Review the workflow source in
 [`deploy-hosted-agent.yml`](https://github.com/ericchansen/foundry-agents/blob/main/.github/workflows/deploy-hosted-agent.yml).

@@ -52,6 +52,47 @@ jobs:
           az bicep build --file infra/main.bicep --stdout > /dev/null
           pwsh -File ./scripts/test-image.ps1 -ImageName "$AGENT_NAME:ci" -ProjectPath ./src/agent -Port 18088
 
+      - name: Validate required repository variables
+        shell: bash
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          AZURE_CONTAINER_REGISTRY_ENDPOINT: ${{ vars.AZURE_CONTAINER_REGISTRY_ENDPOINT }}
+          AZURE_CONTAINER_REGISTRY_RESOURCE_ID: ${{ vars.AZURE_CONTAINER_REGISTRY_RESOURCE_ID }}
+          FOUNDRY_PROJECT_ENDPOINT: ${{ vars.FOUNDRY_PROJECT_ENDPOINT }}
+          AZURE_AI_PROJECT_ID: ${{ vars.AZURE_AI_PROJECT_ID }}
+          FOUNDRY_MODEL_DEPLOYMENT_NAME: ${{ vars.FOUNDRY_MODEL_DEPLOYMENT_NAME }}
+          AZD_ENV_NAME: ${{ vars.AZD_ENV_NAME }}
+        run: |
+          set -euo pipefail
+          required_variables=(
+            AZURE_CLIENT_ID
+            AZURE_TENANT_ID
+            AZURE_SUBSCRIPTION_ID
+            AZURE_LOCATION
+            AZURE_RESOURCE_GROUP
+            AZURE_CONTAINER_REGISTRY_ENDPOINT
+            AZURE_CONTAINER_REGISTRY_RESOURCE_ID
+            FOUNDRY_PROJECT_ENDPOINT
+            AZURE_AI_PROJECT_ID
+            FOUNDRY_MODEL_DEPLOYMENT_NAME
+            AZD_ENV_NAME
+          )
+          missing_variables=()
+          for variable_name in "${required_variables[@]}"; do
+            if [[ -z "${!variable_name:-}" ]]; then
+              missing_variables+=("$variable_name")
+            fi
+          done
+          if ((${#missing_variables[@]})); then
+            IFS=', '
+            echo "::error::Missing required GitHub Actions repository variables: ${missing_variables[*]}"
+            exit 1
+          fi
+
       - name: Sign in to Azure with OIDC
         uses: azure/login@v2
         with:
@@ -75,6 +116,8 @@ jobs:
           azd env set AZURE_TENANT_ID "${{ vars.AZURE_TENANT_ID }}"
           azd env set AZURE_LOCATION "${{ vars.AZURE_LOCATION }}"
           azd env set AZURE_RESOURCE_GROUP "${{ vars.AZURE_RESOURCE_GROUP }}"
+          azd env set AZURE_CONTAINER_REGISTRY_ENDPOINT "${{ vars.AZURE_CONTAINER_REGISTRY_ENDPOINT }}"
+          azd env set AZURE_CONTAINER_REGISTRY_RESOURCE_ID "${{ vars.AZURE_CONTAINER_REGISTRY_RESOURCE_ID }}"
           azd env set FOUNDRY_PROJECT_ENDPOINT "${{ vars.FOUNDRY_PROJECT_ENDPOINT }}"
           azd env set AZURE_AI_PROJECT_ID "${{ vars.AZURE_AI_PROJECT_ID }}"
           azd env set AZURE_AI_FOUNDRY_PROJECT_ID "${{ vars.AZURE_AI_PROJECT_ID }}"

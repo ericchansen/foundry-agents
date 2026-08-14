@@ -121,15 +121,46 @@ class InfrastructureTests(unittest.TestCase):
         workflow = (
             ROOT / ".github" / "workflows" / "deploy-hosted-agent.yml"
         ).read_text(encoding="utf-8")
+        required_variables = (
+            "AZURE_CLIENT_ID",
+            "AZURE_TENANT_ID",
+            "AZURE_SUBSCRIPTION_ID",
+            "AZURE_LOCATION",
+            "AZURE_RESOURCE_GROUP",
+            "AZURE_CONTAINER_REGISTRY_ENDPOINT",
+            "AZURE_CONTAINER_REGISTRY_RESOURCE_ID",
+            "FOUNDRY_PROJECT_ENDPOINT",
+            "AZURE_AI_PROJECT_ID",
+            "FOUNDRY_MODEL_DEPLOYMENT_NAME",
+            "AZD_ENV_NAME",
+        )
 
         self.assertIn("branches: [main]", workflow)
         self.assertIn("      - azure.yaml", workflow)
         self.assertIn("      - src/agent/**", workflow)
+        self.assertIn("      - .github/workflows/deploy-hosted-agent.yml", workflow)
         self.assertNotIn("      - infra/**", workflow)
         self.assertNotIn("      - docs/**", workflow)
         self.assertIn("workflow_dispatch:", workflow)
         self.assertIn("id-token: write", workflow)
         self.assertNotIn("environment: foundry-hosted-agent", workflow)
+        self.assertIn("name: Validate required repository variables", workflow)
+        self.assertIn("Missing required GitHub Actions repository variables", workflow)
+        self.assertLess(
+            workflow.index("name: Validate required repository variables"),
+            workflow.index("name: Sign in to Azure with OIDC"),
+        )
+        for variable_name in required_variables:
+            self.assertIn(f"{variable_name}: ${{{{ vars.{variable_name} }}}}", workflow)
+            self.assertIn(f"            {variable_name}", workflow)
+        self.assertIn(
+            'azd env set AZURE_CONTAINER_REGISTRY_ENDPOINT "${{ vars.AZURE_CONTAINER_REGISTRY_ENDPOINT }}"',
+            workflow,
+        )
+        self.assertIn(
+            'azd env set AZURE_CONTAINER_REGISTRY_RESOURCE_ID "${{ vars.AZURE_CONTAINER_REGISTRY_RESOURCE_ID }}"',
+            workflow,
+        )
         self.assertIn("azure/login@v2", workflow)
         self.assertIn("auth.useAzCliAuth true", workflow)
         self.assertIn("azd deploy --no-prompt", workflow)
