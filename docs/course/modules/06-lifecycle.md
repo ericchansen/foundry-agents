@@ -68,7 +68,10 @@ previous known-good version; do not rebuild its image. The pipeline identity
 needs ACR push permission and the **Foundry Project Manager** role. Authenticate
 the pipeline through workload identity federation (OIDC), not a stored client
 secret. See the [hosted agent requirements]({{ '/hosted-agent-requirements/#cicd-release-lifecycle' | relative_url }})
-for the full release checklist and official references.
+for the full release checklist and official references. The
+[GitHub Actions deployment guide]({{ '/github-actions-hosted-agent/' | relative_url }})
+shows how this repository automates the root demo with OIDC and a
+post-activation smoke test.
 
 ## Debug
 

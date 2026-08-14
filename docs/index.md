@@ -19,6 +19,7 @@ workflow that accompany the hands-on course.
 | Understand platform, image, protocol, and identity responsibilities | [Mental model]({{ '/mental-model/' | relative_url }}) |
 | Build, provision, deploy, invoke, and inspect an agent through azd, Python, REST, or source code | [Command cheat sheet]({{ '/cheat-sheet/' | relative_url }}) |
 | Follow the complete implementation walkthrough | [Implementation reference]({{ '/implementation-reference/' | relative_url }}) |
+| Automate root-agent releases with GitHub Actions OIDC | [GitHub Actions deployment]({{ '/github-actions-hosted-agent/' | relative_url }}) |
 | Diagnose a failed build, deployment, or request | [Troubleshooting playbook]({{ '/troubleshooting-playbook/' | relative_url }}) |
 | Lead a customer discovery and demonstration | [Customer walkthrough]({{ '/customer-walkthrough/' | relative_url }}) |
 
