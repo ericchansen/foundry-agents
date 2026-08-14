@@ -58,6 +58,27 @@ class InfrastructureTests(unittest.TestCase):
         for resource_type in expected_types:
             self.assertIn(resource_type, source)
 
+    def test_optional_github_actions_identity_is_constrained_to_main(self):
+        identity = (
+            INFRA / "modules" / "github-actions-identity.bicep"
+        ).read_text(encoding="utf-8")
+        main = (INFRA / "main.bicep").read_text(encoding="utf-8")
+
+        self.assertIn("Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31", identity)
+        self.assertIn(
+            "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2024-11-30",
+            identity,
+        )
+        self.assertIn("https://token.actions.githubusercontent.com", identity)
+        self.assertIn(
+            "repo:ericchansen@5395779/foundry-agents@1333280174:ref:refs/heads/main",
+            identity,
+        )
+        self.assertIn("api://AzureADTokenExchange", identity)
+        self.assertIn("enableGithubActionsIdentity", main)
+        self.assertIn("GITHUB_ACTIONS_CLIENT_ID", main)
+        self.assertIn("GITHUB_ACTIONS_PRINCIPAL_ID", main)
+
     def test_identity_roles_are_scoped_to_the_correct_principals(self):
         acr = (INFRA / "modules" / "acr.bicep").read_text(encoding="utf-8")
         resources = (INFRA / "modules" / "resources.bicep").read_text(
@@ -95,6 +116,26 @@ class InfrastructureTests(unittest.TestCase):
         ).lower()
         self.assertNotIn("azure.ai.agent", source)
         self.assertNotIn("agent version", source)
+
+    def test_root_hosted_agent_workflow_is_scoped_and_uses_oidc(self):
+        workflow = (
+            ROOT / ".github" / "workflows" / "deploy-hosted-agent.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("branches: [main]", workflow)
+        self.assertIn("      - azure.yaml", workflow)
+        self.assertIn("      - src/agent/**", workflow)
+        self.assertNotIn("      - infra/**", workflow)
+        self.assertNotIn("      - docs/**", workflow)
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("id-token: write", workflow)
+        self.assertNotIn("environment: foundry-hosted-agent", workflow)
+        self.assertIn("azure/login@v2", workflow)
+        self.assertIn("auth.useAzCliAuth true", workflow)
+        self.assertIn("azd deploy --no-prompt", workflow)
+        self.assertIn("azd ai agent show --no-prompt --output table", workflow)
+        self.assertIn("azd ai agent invoke", workflow)
+        self.assertIn("Responses-protocol smoke test returned an empty response", workflow)
 
 
 if __name__ == "__main__":

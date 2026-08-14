@@ -93,6 +93,17 @@ the **Foundry Project Manager** role for agent lifecycle operations. Configure a
 federated identity credential that trusts the pipeline's OIDC tokens; do not
 store a client secret in the CI system.
 
+### Root demo automation
+
+The root `custom-image-hosted-agent-lab` has an automatic main-branch workflow
+in [`deploy-hosted-agent.yml`](../.github/workflows/deploy-hosted-agent.yml).
+It runs `azd deploy`, which can create and activate the new version as one
+operation, then invokes the active Responses endpoint. Its smoke test is a
+post-deployment confirmation, not a pre-activation approval gate. Use a staged
+SDK or REST release flow when production policy requires candidate testing and
+an explicit promotion decision before traffic changes. Setup details are in
+[the GitHub Actions deployment guide](github-actions-hosted-agent.md).
+
 ## Learn more
 
 - [Deploy a hosted agent](https://learn.microsoft.com/azure/foundry/agents/how-to/deploy-hosted-agent)

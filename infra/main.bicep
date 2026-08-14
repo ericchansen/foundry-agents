@@ -45,6 +45,9 @@ param enableMonitoring bool = true
 @description('Optional salt used to create a different set of globally unique names.')
 param resourceTokenSalt string = ''
 
+@description('Create the GitHub Actions OIDC deployment identity and its scoped role assignments.')
+param enableGithubActionsIdentity bool = false
+
 var effectiveResourceGroupName = empty(resourceGroupName)
   ? 'rg-${environmentName}'
   : resourceGroupName
@@ -75,6 +78,19 @@ module resources './modules/resources.bicep' = {
   }
 }
 
+module githubActionsIdentity './modules/github-actions-identity.bicep' = if (enableGithubActionsIdentity) {
+  scope: resourceGroup
+  name: 'github-actions-identity'
+  params: {
+    name: 'id-${take(environmentName, 20)}-github-actions'
+    location: location
+    tags: tags
+    foundryAccountName: resources.outputs.accountName
+    foundryProjectName: resources.outputs.projectName
+    registryName: resources.outputs.acrName
+  }
+}
+
 output AZURE_RESOURCE_GROUP string = resourceGroup.name
 output AZURE_FOUNDRY_RESOURCE_GROUP string = resourceGroup.name
 output AZURE_AI_ACCOUNT_ID string = resources.outputs.accountId
@@ -92,6 +108,8 @@ output AZURE_AI_PROJECT_ACR_CONNECTION_NAME string = resources.outputs.acrConnec
 output APPLICATIONINSIGHTS_RESOURCE_ID string = resources.outputs.appInsightsId
 output APPLICATIONINSIGHTS_CONNECTION_NAME string = resources.outputs.appInsightsConnectionName
 output AZURE_AI_PROJECT_CONNECTION_NAMES string = resources.outputs.connectionNames
+output GITHUB_ACTIONS_CLIENT_ID string = enableGithubActionsIdentity ? githubActionsIdentity!.outputs.clientId : ''
+output GITHUB_ACTIONS_PRINCIPAL_ID string = enableGithubActionsIdentity ? githubActionsIdentity!.outputs.principalId : ''
 
 @secure()
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = resources.outputs.appInsightsConnectionString

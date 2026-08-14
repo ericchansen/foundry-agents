@@ -1,0 +1,101 @@
+name: Deploy root hosted agent
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - azure.yaml
+      - src/agent/**
+      - .github/workflows/deploy-hosted-agent.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: root-hosted-agent-release
+  cancel-in-progress: false
+
+env:
+  AGENT_NAME: custom-image-hosted-agent-lab
+  AGENT_SMOKE_PROMPT: "Reply with a concise confirmation that the Responses protocol is available."
+
+jobs:
+  deploy-and-smoke-test:
+    name: Deploy and smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Azure Developer CLI
+        uses: Azure/setup-azd@v2
+
+      - name: Install Foundry extensions
+        shell: bash
+        run: |
+          set -euo pipefail
+          azd version
+          azd ext install microsoft.foundry
+          azd ext install azure.ai.agents
+          azd ext install azure.ai.projects
+          azd ext list --installed | grep -E 'microsoft\.foundry|azure\.ai\.agents|azure\.ai\.projects'
+          azd ai agent --help > /dev/null
+
+      - name: Validate root agent inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v
+          python -m compileall -q src tests
+          az bicep build --file infra/main.bicep --stdout > /dev/null
+          pwsh -File ./scripts/test-image.ps1 -ImageName "$AGENT_NAME:ci" -ProjectPath ./src/agent -Port 18088
+
+      - name: Sign in to Azure with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Configure azd for Azure CLI authentication
+        shell: bash
+        run: |
+          set -euo pipefail
+          azd config set auth.useAzCliAuth true
+          azd config set defaults.subscription "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+
+      - name: Reconstruct azd environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          azd env select "${{ vars.AZD_ENV_NAME }}" || azd env new "${{ vars.AZD_ENV_NAME }}" --no-prompt
+          azd env set AZURE_SUBSCRIPTION_ID "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+          azd env set AZURE_TENANT_ID "${{ vars.AZURE_TENANT_ID }}"
+          azd env set AZURE_LOCATION "${{ vars.AZURE_LOCATION }}"
+          azd env set AZURE_RESOURCE_GROUP "${{ vars.AZURE_RESOURCE_GROUP }}"
+          azd env set FOUNDRY_PROJECT_ENDPOINT "${{ vars.FOUNDRY_PROJECT_ENDPOINT }}"
+          azd env set AZURE_AI_PROJECT_ID "${{ vars.AZURE_AI_PROJECT_ID }}"
+          azd env set AZURE_AI_FOUNDRY_PROJECT_ID "${{ vars.AZURE_AI_PROJECT_ID }}"
+          azd env set FOUNDRY_MODEL_NAME "${{ vars.FOUNDRY_MODEL_DEPLOYMENT_NAME }}"
+          azd env set MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME "${{ vars.FOUNDRY_MODEL_DEPLOYMENT_NAME }}"
+          azd env get-values
+
+      - name: Deploy root hosted agent
+        run: azd deploy --no-prompt
+
+      - name: Show agent status
+        run: azd ai agent show --no-prompt --output table
+
+      - name: Smoke test Responses protocol
+        shell: bash
+        run: |
+          set -euo pipefail
+          response_file="$(mktemp)"
+          azd ai agent invoke "$AGENT_NAME" "$AGENT_SMOKE_PROMPT" --new-session --no-prompt --output raw > "$response_file"
+          if ! grep -q '[^[:space:]]' "$response_file"; then
+            echo "::error::The Responses-protocol smoke test returned an empty response."
+            exit 1
+          fi
+          cat "$response_file"
