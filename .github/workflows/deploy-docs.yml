@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - docs/**
+      - tests/test_course_structure.py
       - .github/workflows/deploy-docs.yml
   pull_request:
     paths:
       - docs/**
+      - tests/test_course_structure.py
       - .github/workflows/deploy-docs.yml
 
 permissions:
@@ -26,6 +28,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Validate course structure and links
+        run: python -m unittest tests.test_course_structure
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
