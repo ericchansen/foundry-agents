@@ -63,6 +63,36 @@ azd ai agent invoke "Explain the hosted-agent container boundary."
 azd ai agent monitor --follow
 ```
 
+## Python SDK deployment
+
+```powershell
+Set-Location .\examples\04-python-sdk-deployment
+python -m pip install -r requirements.txt
+$env:FOUNDRY_PROJECT_ENDPOINT = "https://<account>.services.ai.azure.com/api/projects/<project>"
+$env:HOSTED_AGENT_IMAGE = "<registry>.azurecr.io/agents/custom-image-agent@sha256:<digest>"
+$env:MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME = "<model-deployment>"
+python deploy.py
+```
+
+## REST deployment
+
+```powershell
+Set-Location .\examples\05-rest-deployment
+.\deploy-hosted-agent.ps1 `
+  -FoundryProjectEndpoint "https://<account>.services.ai.azure.com/api/projects/<project>" `
+  -Image "<registry>.azurecr.io/agents/custom-image-agent@sha256:<digest>" `
+  -ModelDeploymentName "<model-deployment>"
+```
+
+## Source-code deployment
+
+```powershell
+Set-Location .\examples\06-source-code-deployment
+azd env new source-code-hosted-agent-lab
+azd env set AZURE_LOCATION <location>
+azd up
+```
+
 ## Responses protocol
 
 ```powershell

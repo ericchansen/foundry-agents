@@ -14,10 +14,7 @@ class InfrastructureTests(unittest.TestCase):
             r"(?m)^infra:\n  provider: bicep\n  path: \./infra\n  module: main$",
         )
         parameters = (INFRA / "main.bicepparam").read_text(encoding="utf-8")
-        self.assertIn(
-            "readEnvironmentVariable('AI_PROJECT_DEPLOYMENTS', '[]')",
-            parameters,
-        )
+        self.assertNotIn("AI_PROJECT_DEPLOYMENTS", parameters)
         self.assertIn("readEnvironmentVariable('AZURE_LOCATION')", parameters)
         self.assertFalse((INFRA / "main.parameters.json").exists())
 
@@ -33,6 +30,18 @@ class InfrastructureTests(unittest.TestCase):
                 source,
             )
             self.assertNotIn("FOUNDRY_MODEL_NAME:", source)
+
+    def test_prebuilt_and_source_examples_have_complete_manifests(self):
+        prebuilt = (
+            ROOT / "examples" / "03-prebuilt-image" / "azure.yaml"
+        ).read_text(encoding="utf-8")
+        source = (
+            ROOT / "examples" / "06-source-code-deployment" / "azure.yaml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("path: ../../infra", prebuilt)
+        self.assertIn("path: ../../infra", source)
+        self.assertIn("entryPoint: main.py", source)
 
     def test_expected_resource_graph_is_declared(self):
         source = "\n".join(

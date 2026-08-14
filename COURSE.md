@@ -18,8 +18,11 @@ At the end of the course, you can independently:
 5. Provision and deploy the same system with `azd`.
 6. Invoke, observe, version, and roll back the hosted agent.
 7. Deploy a prebuilt ACR image by digest.
-8. Troubleshoot failures from image build through agent identity.
-9. Lead a customer discovery and architecture discussion.
+8. Deploy a container directly with the Python SDK.
+9. Deploy a container directly with the REST API.
+10. Deploy source code without building a container.
+11. Troubleshoot failures from image build through agent identity.
+12. Lead a customer discovery and architecture discussion.
 
 ## How each lesson works
 
@@ -60,6 +63,9 @@ Then follow the instructor rather than reading ahead.
 | [5](lessons/05-azd/README.md) | `azd` provisioning and deployment | The same environment operated through `azd` |
 | [6](lessons/06-lifecycle/README.md) | Invoke, observe, and version | Endpoint evidence, logs, traces, and a second version |
 | [7](lessons/07-prebuilt-acr/README.md) | Prebuilt ACR image | A digest-pinned deployment without rebuilding |
+| [10](lessons/10-python-sdk/README.md) | Python SDK deployment | A version created, polled, and invoked from Python |
+| [11](lessons/11-rest-api/README.md) | REST API deployment | A version created, polled, and invoked from PowerShell |
+| [12](lessons/12-source-code/README.md) | Source-code deployment | A Docker-less version using remote dependency resolution |
 | [8](lessons/08-troubleshooting/README.md) | Failure lab | A completed diagnostic evidence table |
 | [9](lessons/09-capstone/README.md) | Independent capstone | A clean deployment and no-notes teach-back |
 
@@ -77,6 +83,9 @@ Completion is based on evidence, not on reading.
 | 5 | `azd` can provision idempotently and deploy the agent. |
 | 6 | You invoke two versions, inspect telemetry, and explain rollback. |
 | 7 | Foundry pulls a digest-pinned image from ACR. |
+| 10 | Python creates an active version and invokes its endpoint. |
+| 11 | REST creates an active version and invokes its endpoint. |
+| 12 | A source-code version becomes active without a container image. |
 | 8 | You diagnose each failure by layer before looking at the answer. |
 | 9 | You complete the capstone and customer simulation without procedural help. |
 

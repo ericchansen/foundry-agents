@@ -25,8 +25,10 @@ By completing the lab, you will be able to explain and demonstrate:
    dedicated Microsoft Entra agent identity through `DefaultAzureCredential`.
 4. How `azd` builds a Dockerfile, pushes the image to Azure Container Registry
    (ACR), creates an agent version, and routes traffic to it.
-5. How the workflow changes when a customer supplies a prebuilt image in an
-   existing ACR.
+5. How to create the same container-based version through the Python SDK or
+   REST API.
+6. How the workflow changes when a customer supplies a prebuilt image in an
+   existing ACR or deploys source code without Docker.
 
 ## Architecture
 
@@ -86,6 +88,9 @@ the exact artifact with an immutable digest, for example
 | `src/agent/Dockerfile` | Builds the Linux `amd64` image that Foundry runs. |
 | `scripts/check-prerequisites.ps1` | Checks the local toolchain without changing it. |
 | `scripts/test-image.ps1` | Builds the image and invokes it locally in deterministic echo mode. |
+| `examples/04-python-sdk-deployment/` | Creates and invokes a hosted agent through the Python SDK. |
+| `examples/05-rest-deployment/` | Creates and invokes a hosted agent through the REST API. |
+| `examples/06-source-code-deployment/` | Deploys the agent source with Foundry remote build. |
 | `docs/customer-walkthrough.md` | A discovery and demonstration guide for a customer call. |
 
 ## Lab 0: Check the toolchain
@@ -189,8 +194,9 @@ azd env new hosted-agent-lab
 azd up
 ```
 
-`azd up` provisions the declared resources, builds the Docker image, pushes it
-to ACR, creates a hosted-agent version, and configures the agent endpoint.
+`azd up` provisions the Bicep-declared resources, builds the Docker image,
+pushes it to ACR, creates a hosted-agent version, and configures the agent
+endpoint.
 
 Inspect and invoke the result:
 
@@ -245,6 +251,7 @@ customer image uses a different path:
 5. Deploy:
 
    ```powershell
+   az acr login --name <registry-name>
    azd deploy
    ```
 

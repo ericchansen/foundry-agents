@@ -34,6 +34,22 @@ Each session runs in an isolated sandbox. The platform can scale inactive
 sessions to zero while preserving the session filesystem, then restore that
 state when the session resumes.
 
+## Deployment choices
+
+Use `azd` when you want the tooling to provision infrastructure, package the
+artifact, and create the agent version. Use the Python SDK when Python code
+owns deployment automation, or the REST API for language-agnostic delivery
+systems. Each interface can deploy a container image; Foundry also supports a
+Docker-less source-code archive for supported Python and .NET runtimes.
+
+The course includes runnable examples for:
+
+- `README.md` Lab 3 and `examples/03-prebuilt-image/` for `azd` container
+  deployment and a prebuilt ACR image
+- `examples/04-python-sdk-deployment/` for Python SDK deployment
+- `examples/05-rest-deployment/` for REST API deployment
+- `examples/06-source-code-deployment/` for Docker-less source-code deployment
+
 ## Protocol choice
 
 Start with **Responses** for a conversational agent: Foundry manages

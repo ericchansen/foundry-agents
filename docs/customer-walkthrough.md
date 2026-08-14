@@ -5,8 +5,8 @@ description: Run hosted-agent discovery and demonstration conversations with cus
 
 # Customer walkthrough guide
 
-Use this guide to turn a vague "deploy our custom image as an agent" request
-into a concrete hosted-agent plan.
+Use this guide to turn a vague "deploy our code as an agent" request into a
+concrete hosted-agent plan.
 
 ## Open the meeting
 
@@ -17,13 +17,26 @@ State the boundary clearly:
 > endpoint, agent identity, scaling, session lifecycle, and version deployment.
 
 Then confirm that the customer needs a hosted agent rather than a prompt agent
-because they need to control the runtime or supply a container image.
+because they need custom runtime behavior, a controlled container image, or a
+source-code deployment path.
+
+## Choose the deployment interface
+
+| Interface | Use when |
+| --- | --- |
+| `azd` | The team wants guided provisioning, deployment, and RBAC automation. |
+| Python SDK | A Python application or automation owns the release workflow. |
+| REST API | Existing delivery tooling is language-agnostic or must call HTTP directly. |
+
+The deployment interface is independent of the artifact: Foundry can receive
+an `azd`-built image, a prebuilt ACR image, or a Docker-less source archive.
 
 ## Discovery questions
 
 ### Image and build
 
 - Where is the Dockerfile or prebuilt image?
+- Is a Docker-less source-code deployment acceptable?
 - Is the image Linux `amd64`?
 - Is it built in the customer's pipeline or should `azd` build it?
 - Which ACR contains the image?
@@ -58,15 +71,16 @@ because they need to control the runtime or supply a container image.
 ## Demonstration sequence
 
 1. Show `main.py` and identify the protocol adapter and agent logic.
-2. Show the Dockerfile and identify `linux/amd64`, port `8088`, dependencies,
-   non-root user, and `$HOME`.
-3. Run `scripts/test-image.ps1` to prove the image contract locally.
-4. Show `azure.yaml` and identify the project, image build context, protocol,
-   environment variables, and resources.
-5. Run `azd deploy`.
-6. Run `azd ai agent show --output table`.
+2. Choose `azd`, the Python SDK, or REST API and explain why that interface
+   fits the customer's release workflow.
+3. For a container path, show the Dockerfile and identify `linux/amd64`, port
+   `8088`, dependencies, non-root user, and `$HOME`.
+4. Run `scripts/test-image.ps1` to prove the image contract locally.
+5. Show the interface-specific definition: `azure.yaml`, the Python SDK
+   `HostedAgentDefinition`, or the REST request body.
+6. Deploy and poll the version to `active`.
 7. Invoke the deployed agent.
-8. Stream logs with `azd ai agent monitor --follow`.
+8. Stream logs or inspect Application Insights.
 9. Explain that the next deployment creates a new version.
 
 ## Prebuilt-image decision
@@ -88,6 +102,14 @@ The customer must arrange:
 - Pull access for the Foundry project identity and a managed-identity ACR
   project connection.
 - Network reachability from the Foundry runtime to a private ACR.
+
+## Source-code decision
+
+Choose source-code deployment when the team wants a Docker-less inner loop and
+can use Foundry's supported runtime and dependency-resolution model. With
+`remote_build`, Foundry installs dependencies from the uploaded source archive;
+with `bundled`, the team ships prebuilt Linux dependencies. Source-code and
+container configurations cannot coexist on the same agent version.
 
 See [Microsoft's ACR deployment guide][acr-docs] for the current role matrix and
 network constraints.

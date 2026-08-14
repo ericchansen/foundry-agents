@@ -11,15 +11,6 @@ name: custom-image-hosted-agent-lab
 services:
   ai-project:
     host: azure.ai.project
-    deployments:
-      - name: gpt-5.4-mini
-        model:
-          format: OpenAI
-          name: gpt-5.4-mini
-          version: "2026-03-17"
-        sku:
-          name: GlobalStandard
-          capacity: 10
 
   custom-image-agent:
     host: azure.ai.agent
