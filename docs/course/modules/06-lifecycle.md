@@ -58,10 +58,11 @@ Record:
 
 ## CI/CD release lifecycle
 
-A new image pushed to ACR does **not** automatically update an agent. The
-pipeline must resolve the image digest, create a Foundry agent version that
-references it, smoke test that version, and explicitly activate or promote it.
-`azd`, the SDK, and REST are equivalent control-plane clients for this lifecycle.
+A new image pushed to ACR does **not** automatically update an agent. A
+production pipeline must resolve the image digest, create a Foundry agent version
+that references it, smoke test that candidate, and explicitly activate or promote
+it. `azd`, the SDK, and REST are equivalent control-plane clients for this
+lifecycle.
 
 After promotion, monitor the version. To roll back, explicitly reactivate the
 previous known-good version; do not rebuild its image. The pipeline identity
@@ -71,7 +72,9 @@ secret. See the [hosted agent requirements]({{ '/hosted-agent-requirements/#cicd
 for the full release checklist and official references. The
 [GitHub Actions deployment guide]({{ '/github-actions-hosted-agent/' | relative_url }})
 shows how this repository automates the root demo with OIDC and a
-post-activation smoke test.
+post-activation smoke test. It also explains why that automatic flow is not a
+candidate-before-activation production promotion gate and how to bootstrap an
+existing environment without broad reprovisioning.
 
 ## Debug
 
@@ -86,5 +89,6 @@ routing. Include how you would roll back without rebuilding an older image.
 
 ## Checkpoint
 
-Advance only when two versions exist, both are understood, and you can locate
-logs and traces for a specific invocation.
+Advance only when two versions exist, both are understood, you can locate logs
+and traces for a specific invocation, and you can explain why a candidate must
+be tested before activation in a production promotion flow.

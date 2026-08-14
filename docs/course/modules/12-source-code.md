@@ -26,7 +26,7 @@ exclusive for a version. Name the difference between `remote_build` and
 
 ## Predict
 
-Inspect [`examples/06-source-code-deployment/azure.yaml`](https://github.com/ericchansen/foundry-agents/blob/main/examples/06-source-code-deployment/azure.yaml).
+Inspect [`examples/06-source-code-deployment/azure.yaml`](https://github.com/ericchansen/foundry-hosted-agents/blob/main/examples/06-source-code-deployment/azure.yaml).
 Predict the archive entry point, runtime, protocol, and where dependencies
 come from.
 

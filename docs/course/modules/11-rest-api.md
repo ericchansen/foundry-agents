@@ -31,7 +31,7 @@ protocol, CPU, memory, and application environment variables.
 
 ## Perform
 
-From [`examples/05-rest-deployment`](https://github.com/ericchansen/foundry-agents/tree/main/examples/05-rest-deployment), run:
+From [`examples/05-rest-deployment`](https://github.com/ericchansen/foundry-hosted-agents/tree/main/examples/05-rest-deployment), run:
 
 ```powershell
 .\deploy-hosted-agent.ps1 `

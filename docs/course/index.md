@@ -102,6 +102,7 @@ Completion is based on evidence, not on reading.
   checklist before building or deploying an image
 - [Mental model]({{ '/mental-model/' | relative_url }})
 - [Command cheat sheet]({{ '/cheat-sheet/' | relative_url }})
+- [GitHub Actions deployment]({{ '/github-actions-hosted-agent/' | relative_url }}) -- use this before automating a release
 - [Troubleshooting playbook]({{ '/troubleshooting-playbook/' | relative_url }})
 - [Customer walkthrough]({{ '/customer-walkthrough/' | relative_url }})
 - [Answer key]({{ '/course/answer-key/' | relative_url }}) -- use only after attempting an exercise

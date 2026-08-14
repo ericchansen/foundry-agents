@@ -24,7 +24,7 @@ requires from an image.
 
 ## Predict
 
-Read [`src/agent/Dockerfile`](https://github.com/ericchansen/foundry-agents/blob/main/src/agent/Dockerfile) one instruction at a
+Read [`src/agent/Dockerfile`](https://github.com/ericchansen/foundry-hosted-agents/blob/main/src/agent/Dockerfile) one instruction at a
 time. Before moving to the next instruction, state:
 
 - What filesystem or metadata change it makes.

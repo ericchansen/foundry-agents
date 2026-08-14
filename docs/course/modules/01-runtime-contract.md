@@ -20,7 +20,7 @@ complexity.
 
 ## Example
 
-Use [`examples/01-echo-agent`](https://github.com/ericchansen/foundry-agents/tree/main/examples/01-echo-agent).
+Use [`examples/01-echo-agent`](https://github.com/ericchansen/foundry-hosted-agents/tree/main/examples/01-echo-agent).
 
 ## Diagnose
 

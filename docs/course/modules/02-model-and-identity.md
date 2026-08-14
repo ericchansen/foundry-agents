@@ -20,7 +20,7 @@ authentication changes between local and hosted execution.
 
 ## Example
 
-Use [`examples/02-model-agent`](https://github.com/ericchansen/foundry-agents/tree/main/examples/02-model-agent).
+Use [`examples/02-model-agent`](https://github.com/ericchansen/foundry-hosted-agents/tree/main/examples/02-model-agent).
 
 ## Diagnose
 

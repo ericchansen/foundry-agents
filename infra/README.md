@@ -49,11 +49,17 @@ Creating these role assignments requires a principal with role-assignment
 permissions, such as Owner or Role Based Access Control Administrator.
 
 Set `ENABLE_GITHUB_ACTIONS_IDENTITY=true` before `azd provision` to create the
-dedicated user-assigned identity. Its federated credential accepts only tokens
-from `repo:ericchansen@5395779/foundry-agents@1333280174:ref:refs/heads/main`, with issuer
+dedicated user-assigned identity. Its federated credential accepts only the
+configured main-branch GitHub OIDC subject, with issuer
 `https://token.actions.githubusercontent.com` and audience
 `api://AzureADTokenExchange`. The template outputs its client and principal IDs
 without changing the local developer principal assignments.
+
+Repository renames or transfers can change the emitted OIDC subject prefix even
+when the subject includes immutable owner and repository IDs. Before the next
+deployment after either event, inspect GitHub's OIDC customization, update this
+federated credential and the live Azure credential to the returned subject, then
+run a manual workflow dispatch.
 
 ## Important outputs
 
