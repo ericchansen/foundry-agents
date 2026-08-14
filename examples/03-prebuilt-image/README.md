@@ -6,6 +6,7 @@ Dockerfile.
 Set:
 
 ```powershell
+az acr login --name <registry-name>
 azd env set FOUNDRY_PROJECT_ENDPOINT <project-endpoint>
 azd env set MICROSOFT_FOUNDRY_MODEL_DEPLOYMENT_NAME <model-deployment-name>
 azd env set PREBUILT_AGENT_IMAGE `
@@ -16,6 +17,7 @@ azd env set AZD_AGENT_SKIP_ACR true
 Then run:
 
 ```powershell
+azd provision
 azd deploy
 ```
 

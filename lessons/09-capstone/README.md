@@ -40,13 +40,15 @@ From a clean `azd` environment:
 1. Explain the target architecture.
 2. Select the existing long-lived demo resource group.
 3. Preview and reconcile the Bicep infrastructure.
-4. Build and inspect the custom image.
-5. Deploy a new hosted-agent version.
-6. Invoke the Responses endpoint.
-7. Locate the request in logs and traces.
-8. Explain the active identity and its permissions.
-9. Deploy a behavior change as another version.
-10. Demonstrate the rollback plan.
+4. Select a deployment interface: `azd`, Python SDK, or REST API.
+5. Select the matching artifact path: container source, prebuilt image, or
+   source-code archive.
+6. Deploy a new hosted-agent version.
+7. Invoke the Responses endpoint.
+8. Locate the request in logs and traces.
+9. Explain the active identity and its permissions.
+10. Deploy a behavior change as another version.
+11. Demonstrate the rollback plan.
 
 ## Injected incident
 

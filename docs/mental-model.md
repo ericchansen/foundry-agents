@@ -52,15 +52,24 @@ the Foundry project managed identity, which needs pull access to the registry.
 The dedicated agent identity is created with the agent deployment and is the
 identity used by code running inside the container.
 
-## Three deployment paths
+## Deployment interfaces and artifacts
 
-| Path | Artifact supplied to Foundry | Best use |
+Choose an interface to create and operate the agent version, then choose the
+artifact that Foundry runs. These are independent decisions.
+
+| Interface | Best use |
+| --- | --- |
+| Azure Developer CLI (`azd`) | Guided provisioning and deployment with automated packaging and RBAC setup |
+| Python SDK | Python automation or applications that own the release workflow |
+| REST API | Language-agnostic tools and existing delivery systems |
+
+| Artifact path | Artifact supplied to Foundry | Best use |
 | --- | --- | --- |
 | Source deployment | Python or .NET source archive | Fast inner loop without owning the image |
 | Container build | Dockerfile and source | You own runtime dependencies and want `azd` to build |
 | Prebuilt image | ACR image tag or digest | A separate pipeline owns build, scan, signing, and release |
 
-This course focuses on the last two paths.
+This course covers all three interfaces, plus each of these artifact paths.
 
 ## Request path
 
