@@ -66,9 +66,37 @@ myregistry.azurecr.io/agents/lab@sha256:<digest>
 The `sha256` value makes the production artifact selection repeatable even if
 someone moves or reuses a release tag.
 
+## CI/CD release lifecycle
+
+Pushing a new image to ACR does **not** update an existing agent. Foundry does
+not watch an image tag for changes. A release pipeline must deliberately create
+and promote a new agent version that references the resolved digest.
+
+Use `azd`, the Foundry SDK, or the REST API as equivalent control-plane clients:
+each can create and manage the Foundry agent version. `azd` automates more of
+the workflow, while SDK and REST integrations let a pipeline manage the same
+version lifecycle directly.
+
+1. Authenticate the pipeline to Azure with workload identity federation (OIDC),
+   not a stored client secret.
+2. Build a Linux `amd64` image, then test, scan, sign, and push it to ACR.
+3. Resolve the pushed image digest and create a Foundry agent version that
+   references that exact digest.
+4. Invoke the candidate version for a smoke test.
+5. Explicitly activate or promote the tested version, then monitor its logs,
+   traces, and deployment status.
+6. If the release fails, roll back by explicitly reactivating the previous
+   known-good version. Do not rebuild the old image just to roll back.
+
+The pipeline identity needs ACR push permission for the image repository and
+the **Foundry Project Manager** role for agent lifecycle operations. Configure a
+federated identity credential that trusts the pipeline's OIDC tokens; do not
+store a client secret in the CI system.
+
 ## Learn more
 
 - [Deploy a hosted agent](https://learn.microsoft.com/azure/foundry/agents/how-to/deploy-hosted-agent)
 - [Deploy a hosted agent with a private Azure Container Registry](https://learn.microsoft.com/azure/foundry/agents/how-to/deploy-hosted-agent-private-azure-container-registry)
 - [azure.yaml reference for hosted agents](https://learn.microsoft.com/azure/foundry/agents/concepts/azure-yaml-reference)
 - [Hosted agents in Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/concepts/hosted-agents)
+- [Authenticate to Azure from GitHub Actions by OpenID Connect](https://learn.microsoft.com/azure/developer/github/connect-from-azure-openid-connect)

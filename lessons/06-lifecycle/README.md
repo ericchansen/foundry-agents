@@ -43,6 +43,20 @@ Record:
 | Deployment status | | |
 | Trace evidence | | |
 
+## CI/CD release lifecycle
+
+A new image pushed to ACR does **not** automatically update an agent. The
+pipeline must resolve the image digest, create a Foundry agent version that
+references it, smoke test that version, and explicitly activate or promote it.
+`azd`, the SDK, and REST are equivalent control-plane clients for this lifecycle.
+
+After promotion, monitor the version. To roll back, explicitly reactivate the
+previous known-good version; do not rebuild its image. The pipeline identity
+needs ACR push permission and the **Foundry Project Manager** role. Authenticate
+the pipeline through workload identity federation (OIDC), not a stored client
+secret. See the [hosted agent requirements](../../docs/hosted-agent-requirements.md#cicd-release-lifecycle)
+for the full release checklist and official references.
+
 ## Debug
 
 Introduce a harmless startup configuration failure in a new version. Observe
