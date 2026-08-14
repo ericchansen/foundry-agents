@@ -78,6 +78,11 @@ class InfrastructureTests(unittest.TestCase):
         self.assertIn("enableGithubActionsIdentity", main)
         self.assertIn("GITHUB_ACTIONS_CLIENT_ID", main)
         self.assertIn("GITHUB_ACTIONS_PRINCIPAL_ID", main)
+        self.assertIn("githubActionsAcrPush", identity)
+        self.assertIn("acrPushRoleId", identity)
+        self.assertIn("8311e382-0749-4cb8-b61a-304f252e45ec", identity)
+        self.assertNotIn("githubActionsAcrTasksContributor", identity)
+        self.assertNotIn("fb382eab-e894-4461-af04-94435c366c3f", identity)
 
     def test_identity_roles_are_scoped_to_the_correct_principals(self):
         acr = (INFRA / "modules" / "acr.bicep").read_text(encoding="utf-8")
@@ -165,8 +170,19 @@ class InfrastructureTests(unittest.TestCase):
         self.assertIn("auth.useAzCliAuth true", workflow)
         self.assertIn("azd deploy --no-prompt", workflow)
         self.assertIn("azd ai agent show --no-prompt --output table", workflow)
-        self.assertIn("azd ai agent invoke", workflow)
-        self.assertIn("Responses-protocol smoke test returned an empty response", workflow)
+        self.assertNotIn("azd ai agent invoke", workflow)
+        self.assertIn(
+            "az account get-access-token --resource https://ai.azure.com",
+            workflow,
+        )
+        self.assertIn(
+            '${FOUNDRY_PROJECT_ENDPOINT%/}/agents/${AGENT_NAME}/endpoint/protocols/openai/responses?api-version=v1',
+            workflow,
+        )
+        self.assertIn('jq --null-input --arg input "$AGENT_SMOKE_PROMPT"', workflow)
+        self.assertIn("curl --silent --show-error", workflow)
+        self.assertIn('.status == "completed"', workflow)
+        self.assertIn('.type == "output_text"', workflow)
 
 
 if __name__ == "__main__":

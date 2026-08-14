@@ -38,9 +38,9 @@ reliably.
 
 | Principal | Role and scope | Why |
 | --- | --- | --- |
-| Developer or CI principal | Foundry Project Manager on the project | Deploy and operate hosted agents |
-| Developer or CI principal | Container Registry Tasks Contributor on ACR | Build and push container images |
-| GitHub Actions deployment identity | Foundry Project Manager on the project and Container Registry Tasks Contributor on ACR | Build, deploy, and operate the root hosted agent through OIDC |
+| Developer principal | Foundry Project Manager on the project | Deploy and operate hosted agents |
+| Developer principal | Container Registry Tasks Contributor on ACR | Build and push container images through ACR tasks |
+| GitHub Actions deployment identity | Foundry Project Manager on the project and AcrPush on ACR | Build locally, push the image through the registry data plane, deploy, and operate the root hosted agent through OIDC |
 | Foundry project managed identity | AcrPull on ACR | Supply images to the hosted-agent platform |
 | Foundry project managed identity | Log Analytics Reader on Application Insights | Read traces for evaluation |
 | Dedicated agent identity | Created during `azd deploy`, not in Bicep | Authenticate runtime code to models and dependencies |
