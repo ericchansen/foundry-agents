@@ -3,13 +3,43 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
+MODULES = ROOT / "docs" / "course" / "modules"
+COURSE_SEQUENCE = [
+    "00-baseline",
+    "01-runtime-contract",
+    "02-model-and-identity",
+    "03-custom-image",
+    "04-bicep",
+    "05-azd",
+    "06-lifecycle",
+    "07-prebuilt-acr",
+    "10-python-sdk",
+    "11-rest-api",
+    "12-source-code",
+    "08-troubleshooting",
+    "09-capstone",
+]
+
+
+def read_front_matter(path):
+    text = path.read_text(encoding="utf-8")
+    parts = text.split("---", 2)
+    if len(parts) != 3 or parts[0].strip():
+        raise AssertionError(f"{path} is missing YAML front matter.")
+
+    metadata = {}
+    for line in parts[1].splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        metadata[key.strip()] = value.strip().strip('"')
+    return metadata, parts[2]
 
 
 class CourseStructureTests(unittest.TestCase):
     def test_all_modules_exist(self):
-        for module in range(13):
-            matches = list((ROOT / "lessons").glob(f"{module:02d}-*/README.md"))
-            self.assertEqual(1, len(matches), f"Module {module} is missing or duplicated.")
+        actual = {path.stem for path in MODULES.glob("*.md")}
+        self.assertEqual(set(COURSE_SEQUENCE), actual)
 
     def test_each_module_has_active_learning_sections(self):
         required_sections = {
@@ -20,8 +50,9 @@ class CourseStructureTests(unittest.TestCase):
             "checkpoint",
         }
 
-        for lesson in sorted((ROOT / "lessons").glob("[0-9][0-9]-*/README.md")):
-            text = lesson.read_text(encoding="utf-8")
+        for module_name in COURSE_SEQUENCE:
+            lesson = MODULES / f"{module_name}.md"
+            _, text = read_front_matter(lesson)
             headings = {
                 match.group(1).strip().lower()
                 for match in re.finditer(r"^##\s+(.+)$", text, re.MULTILINE)
@@ -52,9 +83,70 @@ class CourseStructureTests(unittest.TestCase):
             self.assertTrue(path.is_file(), f"Missing course example: {path}")
 
     def test_course_references_every_module(self):
-        course = (ROOT / "COURSE.md").read_text(encoding="utf-8")
-        for module in range(13):
-            self.assertRegex(course, rf"lessons/{module:02d}-[^)]+/README\.md")
+        course = (ROOT / "docs" / "course" / "index.md").read_text(encoding="utf-8")
+        for module_name in COURSE_SEQUENCE:
+            self.assertIn(f"/course/modules/{module_name}/", course)
+
+    def test_module_navigation_matches_learning_sequence(self):
+        for order, module_name in enumerate(COURSE_SEQUENCE):
+            path = MODULES / f"{module_name}.md"
+            metadata, _ = read_front_matter(path)
+            self.assertEqual(str(order), metadata.get("course_order"), path)
+            self.assertEqual(
+                f"/course/modules/{module_name}/",
+                metadata.get("permalink"),
+                path,
+            )
+
+            previous_url = metadata.get("previous_url")
+            expected_previous = (
+                f"/course/modules/{COURSE_SEQUENCE[order - 1]}/"
+                if order
+                else None
+            )
+            self.assertEqual(expected_previous, previous_url, path)
+
+            next_url = metadata.get("next_url")
+            expected_next = (
+                f"/course/modules/{COURSE_SEQUENCE[order + 1]}/"
+                if order + 1 < len(COURSE_SEQUENCE)
+                else None
+            )
+            self.assertEqual(expected_next, next_url, path)
+
+    def test_internal_pages_links_resolve(self):
+        permalinks = {"/"}
+        docs = ROOT / "docs"
+        for path in docs.rglob("*.md"):
+            metadata, _ = read_front_matter(path)
+            permalink = metadata.get("permalink")
+            if permalink:
+                permalinks.add(permalink)
+            elif path.parent == docs:
+                permalinks.add(f"/{path.stem}/")
+
+        link_pattern = re.compile(
+            r"\{\{\s*'([^']+)'\s*\|\s*relative_url\s*\}\}"
+        )
+        for path in docs.rglob("*.md"):
+            text = path.read_text(encoding="utf-8")
+            for match in link_pattern.finditer(text):
+                target = match.group(1).split("#", 1)[0]
+                self.assertIn(target, permalinks, f"{path} links to {target}")
+
+    def test_legacy_course_files_are_compatibility_pointers(self):
+        expected = {
+            ROOT / "COURSE.md",
+            ROOT / "lessons" / "ANSWER_KEY.md",
+            ROOT / "failures" / "README.md",
+        }
+        expected.update(
+            ROOT / "lessons" / module_name / "README.md"
+            for module_name in COURSE_SEQUENCE
+        )
+        for path in expected:
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("https://ericchansen.github.io/foundry-agents/", text)
 
     def test_reversible_failure_fixtures_exist(self):
         expected = {

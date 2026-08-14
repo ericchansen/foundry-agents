@@ -13,19 +13,22 @@ workflow that accompany the hands-on course.
 
 | Goal | Read |
 | --- | --- |
+| Complete the instructor-led learning path | [Course: Modules 0 through 12]({{ '/course/' | relative_url }}) |
 | Check a custom image before deployment | [Hosted agent requirements]({{ '/hosted-agent-requirements/' | relative_url }}) |
 | Decide whether hosted agents fit the workload | [Hosted agents]({{ '/hosted-agents/' | relative_url }}) |
 | Understand platform, image, protocol, and identity responsibilities | [Mental model]({{ '/mental-model/' | relative_url }}) |
 | Build, provision, deploy, invoke, and inspect an agent through azd, Python, REST, or source code | [Command cheat sheet]({{ '/cheat-sheet/' | relative_url }}) |
+| Follow the complete implementation walkthrough | [Implementation reference]({{ '/implementation-reference/' | relative_url }}) |
 | Diagnose a failed build, deployment, or request | [Troubleshooting playbook]({{ '/troubleshooting-playbook/' | relative_url }}) |
 | Lead a customer discovery and demonstration | [Customer walkthrough]({{ '/customer-walkthrough/' | relative_url }}) |
 
 ## Lab source
 
 The [repository](https://github.com/ericchansen/foundry-agents) includes the
-instructor-led course, runnable custom-image sample, Bicep infrastructure, and
-deployment scripts. Start the guided sequence from
-[COURSE.md](https://github.com/ericchansen/foundry-agents/blob/main/COURSE.md).
+runnable custom-image sample, deployment-interface examples, Bicep
+infrastructure, and scripts used by the course. Start with the
+[course overview]({{ '/course/' | relative_url }}), then open repository files
+only when a module asks you to inspect or change them.
 
 ## Official sources
 

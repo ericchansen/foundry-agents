@@ -8,22 +8,46 @@
     <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header">
       <div class="shell">
         <a class="brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
         <nav aria-label="Primary navigation">
           <a href="{{ '/' | relative_url }}">Overview</a>
+          <a href="{{ '/course/' | relative_url }}">Course</a>
           <a href="{{ '/hosted-agent-requirements/' | relative_url }}">Requirements</a>
           <a href="{{ '/hosted-agents/' | relative_url }}">Hosted agents</a>
-          <a href="{{ '/mental-model/' | relative_url }}">Mental model</a>
-          <a href="{{ '/cheat-sheet/' | relative_url }}">Commands</a>
+          <a href="{{ '/implementation-reference/' | relative_url }}">Implementation</a>
           <a href="{{ '/troubleshooting-playbook/' | relative_url }}">Troubleshooting</a>
-          <a href="{{ '/customer-walkthrough/' | relative_url }}">Customer walkthrough</a>
         </nav>
       </div>
     </header>
-    <main class="shell content">
+    <main id="main-content" class="shell content">
+      {% if page.section == "course" and page.url != "/course/" %}
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="{{ '/course/' | relative_url }}">Course</a>
+        <span aria-hidden="true">/</span>
+        <span>{{ page.title }}</span>
+      </nav>
+      {% endif %}
       {{ content }}
+      {% if page.previous_url or page.next_url %}
+      <nav class="course-nav" aria-label="Course module navigation">
+        <div>
+          {% if page.previous_url %}
+          <span>Previous</span>
+          <a rel="prev" href="{{ page.previous_url | relative_url }}">{{ page.previous_title }}</a>
+          {% endif %}
+        </div>
+        <a class="course-index" href="{{ '/course/' | relative_url }}">Course index</a>
+        <div class="course-next">
+          {% if page.next_url %}
+          <span>Next</span>
+          <a rel="next" href="{{ page.next_url | relative_url }}">{{ page.next_title }}</a>
+          {% endif %}
+        </div>
+      </nav>
+      {% endif %}
     </main>
     <footer class="shell site-footer">
       <a href="https://github.com/ericchansen/foundry-agents">View the lab repository on GitHub</a>
