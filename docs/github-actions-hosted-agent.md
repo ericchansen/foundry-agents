@@ -1,6 +1,8 @@
 ---
 title: GitHub Actions deployment
 description: Configure OIDC deployment for the root custom-image hosted agent.
+permalink: /github-actions-hosted-agent/
+section: reference
 ---
 
 # GitHub Actions deployment for the root hosted agent
@@ -72,6 +74,9 @@ The workflow assumes the existing project, model deployment, ACR connection,
 and quota are healthy. It deliberately does not run `azd provision`, so it
 cannot repair missing infrastructure or grant additional permissions during a
 release.
+
+Review the workflow source in
+[`deploy-hosted-agent.yml`](https://github.com/ericchansen/foundry-agents/blob/main/.github/workflows/deploy-hosted-agent.yml).
 
 ## References
 

@@ -134,6 +134,16 @@ class CourseStructureTests(unittest.TestCase):
                 target = match.group(1).split("#", 1)[0]
                 self.assertIn(target, permalinks, f"{path} links to {target}")
 
+    def test_pages_do_not_link_to_unpublished_repository_paths(self):
+        docs = ROOT / "docs"
+        for path in docs.rglob("*.md"):
+            text = path.read_text(encoding="utf-8")
+            self.assertNotRegex(
+                text,
+                r"\]\(\.\./",
+                f"{path} links outside the published docs source",
+            )
+
     def test_legacy_course_files_are_compatibility_pointers(self):
         expected = {
             ROOT / "COURSE.md",

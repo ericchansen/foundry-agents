@@ -216,6 +216,17 @@ azd ai agent monitor --follow
 Every subsequent `azd deploy` creates a new agent version while preserving the
 older versions.
 
+### Automate root-agent releases
+
+The repository includes a main-branch GitHub Actions workflow that validates,
+deploys, and smoke tests the root agent through Azure OIDC. It operates an
+existing Foundry environment and intentionally performs a post-activation smoke
+test rather than a pre-activation approval gate.
+
+Use the [GitHub Actions deployment guide]({{ '/github-actions-hosted-agent/' | relative_url }})
+for the required repository variables, one-time identity bootstrap, workflow
+scope, roles, and operating limitations.
+
 ### Use an existing Foundry project
 
 If you do not want this lab to provision a project, replace the `ai-project`
