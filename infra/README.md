@@ -8,7 +8,7 @@ the same resources that `azd provision` operates in Module 5.
 
 | Owner | Resources and lifecycle |
 | --- | --- |
-| Bicep | Resource group, Foundry account and project, model deployment, ACR, Log Analytics, Application Insights, project connections, and stable role assignments |
+| Bicep | Resource group, Foundry account and project, model deployment, ACR, Log Analytics, Application Insights, project connections, stable role assignments, and the optional GitHub Actions deployment identity |
 | Foundry `azd` extensions | Image build and push, dedicated agent identity, hosted-agent endpoint, version creation, protocol endpoints, and version activation |
 
 Hosted-agent versions are release artifacts, so they do not belong in this
@@ -40,12 +40,20 @@ reliably.
 | --- | --- | --- |
 | Developer or CI principal | Foundry Project Manager on the project | Deploy and operate hosted agents |
 | Developer or CI principal | Container Registry Tasks Contributor on ACR | Build and push container images |
+| GitHub Actions deployment identity | Foundry Project Manager on the project and Container Registry Tasks Contributor on ACR | Build, deploy, and operate the root hosted agent through OIDC |
 | Foundry project managed identity | AcrPull on ACR | Supply images to the hosted-agent platform |
 | Foundry project managed identity | Log Analytics Reader on Application Insights | Read traces for evaluation |
 | Dedicated agent identity | Created during `azd deploy`, not in Bicep | Authenticate runtime code to models and dependencies |
 
 Creating these role assignments requires a principal with role-assignment
 permissions, such as Owner or Role Based Access Control Administrator.
+
+Set `ENABLE_GITHUB_ACTIONS_IDENTITY=true` before `azd provision` to create the
+dedicated user-assigned identity. Its federated credential accepts only tokens
+from `repo:ericchansen@5395779/foundry-agents@1333280174:ref:refs/heads/main`, with issuer
+`https://token.actions.githubusercontent.com` and audience
+`api://AzureADTokenExchange`. The template outputs its client and principal IDs
+without changing the local developer principal assignments.
 
 ## Important outputs
 
