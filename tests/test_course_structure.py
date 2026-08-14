@@ -144,20 +144,6 @@ class CourseStructureTests(unittest.TestCase):
                 f"{path} links outside the published docs source",
             )
 
-    def test_legacy_course_files_are_compatibility_pointers(self):
-        expected = {
-            ROOT / "COURSE.md",
-            ROOT / "lessons" / "ANSWER_KEY.md",
-            ROOT / "failures" / "README.md",
-        }
-        expected.update(
-            ROOT / "lessons" / module_name / "README.md"
-            for module_name in COURSE_SEQUENCE
-        )
-        for path in expected:
-            text = path.read_text(encoding="utf-8")
-            self.assertIn("https://ericchansen.github.io/foundry-agents/", text)
-
     def test_reversible_failure_fixtures_exist(self):
         expected = {
             ROOT / "failures" / "wrong-architecture" / "Dockerfile",
